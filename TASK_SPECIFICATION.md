@@ -57,7 +57,12 @@ can check construct validity rather than a correlated proxy (e.g. tool-syntax fl
   invariant that discharges the Hoare verification conditions (proof ≠ passing tests)?
 - **E — bounded preimage search (category ii):** find a witness in a space of 2⁶⁴, where
   verifying is one hash. Included precisely because A–D are self-verifiable and a strong
-  model iterates to the answer; E is where it cannot.
+  model iterates to the answer; E is where it cannot. **Admissibility caveat:** E cannot
+  satisfy gate **G3(b)** (a shipped reference that passes the real grader) or **G4**
+  (human-solvability in-budget) below — no in-budget passing reference can exist without
+  leaking the witness — so E is a **declared exception**: a pilot probe of the
+  search/verification asymmetry, not a fully-admitted task, and a budget-relative
+  difficulty rather than a capability gap.
 
 The empirical result (see `REPORT.md`): for Fable and GPT-5.6 Sol, category (i) is nearly
 empty in the fair, fully-specified regime — A–D were all solved — so E is the task that

@@ -43,7 +43,9 @@ done
 ```
 
 Each verifier self-test checks its oracle/reference solution, known-bad solutions,
-and a trivial baseline before any agent result is accepted.
+and a trivial baseline before any agent result is accepted. (Task E is the exception:
+no in-budget passing reference can exist, so its self-test validates the *checking logic*
+on a throwaway instance — see `REPORT.md`.)
 
 ## Reproduce agent runs
 
@@ -58,9 +60,11 @@ python harness/run_all.py \
   --k 5 \
   --budget 900
 
-python harness/aggregate.py
+# the current aggregator reads ONE schema-v2 run dir, not the legacy results/ saved here:
+python harness/aggregate.py --run-dir results/runs/<run-id>
 ```
 
 Generated runs are written under `results/` and are not committed because raw agent
 transcripts contain machine-specific paths and execution metadata. The report contains
-the audited result table, and the key Task E behaviors are preserved in `evidence/`.
+the pilot result table (with a reproducibility caveat), and the key Task E behaviors are
+preserved in `evidence/`.
