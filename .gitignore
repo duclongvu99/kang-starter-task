@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+.pytest_cache/
+results/
+.DS_Store
+kang_reply.md
+DEFENSE_NOTES.md

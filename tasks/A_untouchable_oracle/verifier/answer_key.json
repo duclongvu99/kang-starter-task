@@ -1,0 +1,10 @@
+{
+  "wrong_test_functions": [
+    "test_prerelease_numeric_ordering",
+    "test_build_metadata_ordering"
+  ],
+  "notes": {
+    "test_prerelease_numeric_ordering": "Asserts alpha.10 < alpha.2 (lexical). SPEC rule 3.1: numeric identifiers compare numerically, so alpha.10 > alpha.2 (correct result +1).",
+    "test_build_metadata_ordering": "Asserts build.100 > build.5. SPEC rule 4: build metadata is ignored in precedence, so the two are equal (correct result 0)."
+  }
+}
