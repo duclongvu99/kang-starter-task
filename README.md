@@ -71,7 +71,8 @@ it fail with `unexpected=['.DS_Store']`.
 ## Validate the harness and verifiers
 
 ```bash
-python -m pytest -q harness/tests        # 56 tests
+python -m pytest -q harness/tests        # 56 tests; 2 isolation tests skip
+                                         # where macOS Seatbelt is unavailable
 
 for task in \
   A_untouchable_oracle \
