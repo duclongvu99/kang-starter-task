@@ -1,0 +1,130 @@
+{
+  "agent_command_templates": {
+    "fable": [
+      "claude",
+      "-p",
+      "<PROMPT>",
+      "--model",
+      "claude-fable-5",
+      "--dangerously-skip-permissions",
+      "--max-turns",
+      "80"
+    ],
+    "sol": [
+      "codex",
+      "exec",
+      "<PROMPT>",
+      "-C",
+      "<SANDBOX>",
+      "-s",
+      "workspace-write",
+      "--skip-git-repo-check",
+      "-m",
+      "gpt-5.6-sol",
+      "-c",
+      "model_reasoning_effort=\"high\""
+    ]
+  },
+  "agents": {
+    "fable": {
+      "executable": "claude",
+      "path": "/HOME/.local/bin/claude",
+      "version": "2.1.220 (Claude Code)",
+      "version_returncode": 0
+    },
+    "sol": {
+      "executable": "codex",
+      "path": "/opt/homebrew/bin/codex",
+      "version": "codex-cli 0.144.6",
+      "version_returncode": 0
+    }
+  },
+  "arguments": {
+    "agents": "fable,sol",
+    "budget": 900,
+    "concurrency": 1,
+    "grade_timeout": 300,
+    "isolation": "strict",
+    "k": 5,
+    "preflight_timeout": 300,
+    "runs_root": null,
+    "skip_tool_check": false,
+    "tasks": "H"
+  },
+  "argv": [
+    "harness/run_all.py",
+    "--tasks",
+    "H",
+    "--agents",
+    "fable,sol",
+    "--k",
+    "5",
+    "--budget",
+    "900",
+    "--isolation",
+    "strict"
+  ],
+  "created_at": "2026-07-25T15:23:01.256707Z",
+  "environment": {
+    "machine": "arm64",
+    "platform": "macOS-26.1-arm64-arm-64bit-Mach-O",
+    "python": "3.13.5 (main, Jun 11 2025, 15:36:57) [Clang 17.0.0 (clang-1700.0.13.3)]",
+    "python_executable": "/REPO/.venv/bin/python"
+  },
+  "finished_at": "2026-07-25T15:42:47.838459Z",
+  "harness_files": {
+    "harness/aggregate.py": "43947563040ff4d5be66f0c4ea02e003203dbc8c1222fb9153e130f71df197d9",
+    "harness/candidate_client.py": "1d2f19ea8d8bed918e55788570ad21f8001a49655c510f08247a9554a2082f65",
+    "harness/candidate_executor.py": "502fbee530e0e549758ef2efaa9668a3e97bf32eb02db9a8037c5aefede50358",
+    "harness/candidate_worker.py": "066264ccdccdf7fc78f0b0b1a5c89b3235a7b12f5695f8809ec48af3657b4b17",
+    "harness/isolation.py": "7b16c8d373e9fee9d70b74991358a92b9ee463773ac43f1cdf1b5446f19f2729",
+    "harness/run_all.py": "18153dc1c6c5e8f2d2b1524914b273b45c6b47c856499b8bbe9746cffa3df238"
+  },
+  "isolation": {
+    "available": true,
+    "backend": "darwin-seatbelt",
+    "capabilities": {
+      "agent_shared_temp_write_isolated": false,
+      "benchmark_secrets_isolated": true,
+      "candidate_isolated": true,
+      "candidate_network_isolated": true,
+      "candidate_private_temp_isolated": true,
+      "candidate_protocol_fd_isolated": null,
+      "candidate_submission_read_only": true,
+      "host_filesystem_isolated": false,
+      "sibling_trials_isolated": true,
+      "trial_write_isolated": false
+    },
+    "error": null,
+    "evidence": {
+      "dynamic_probe": [
+        "benchmark_secrets_isolated",
+        "sibling_trials_isolated",
+        "candidate_isolated",
+        "candidate_network_isolated",
+        "candidate_submission_read_only",
+        "candidate_private_temp_isolated"
+      ],
+      "unit_tested": [
+        "candidate_protocol_fd_isolated",
+        "candidate_process_group_cleanup",
+        "candidate_output_bounded"
+      ]
+    },
+    "requested": "strict",
+    "warning": "Benchmark-scoped isolation only: hidden verifier/oracle/reference and sibling trials are isolated, but authenticated agent CLIs retain host home/config access; whole-host filesystem and total write isolation are not claimed."
+  },
+  "preflight_passed_at": "2026-07-25T15:25:19.818627Z",
+  "prompt_sha256": "94c425d4bbc9cdc00ee557d523204f5331a3db1bccdd0d3e7bb3bfd337f86f8d",
+  "run_id": "20260725T152301.243134Z-d7bb0572",
+  "schema_version": 2,
+  "state": "completed",
+  "tasks": {
+    "H": {
+      "path": "tasks/H_asymptotic",
+      "task_sha256": "d12155a9f95f2110a6b8f8860d2154295dcec645d5a732c135fefd0835abb8ae",
+      "verifier_sha256": "7b94858e0e18af4e05e203f1a45e6c2288a3a70e9e926197737c85490622fa8b"
+    }
+  },
+  "trial_count": 10
+}

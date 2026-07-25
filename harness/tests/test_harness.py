@@ -393,6 +393,34 @@ def test_ambiguous_infra_word_still_voids_when_harness_saw_a_failure(tmp_path: P
     assert "agent_infra_signature:authentication" in record["status_reason"]
 
 
+def test_platform_refusal_is_labeled_distinctly_not_as_nonzero_exit(tmp_path: Path) -> None:
+    """A safety refusal is its own outcome, never a generic nonzero exit or infra failure.
+
+    Both agents' platforms refused Task I (offensive security) with rc=1. Without this the
+    refusal would be read as `agent_nonzero_exit` and be indistinguishable from a crash;
+    it must surface as `agent_refused:<platform>` so it is never mistaken for incapability.
+    """
+    log = tmp_path / "refusal.log"
+    log.write_text(
+        "I'll read the spec.\n"
+        "API Error: Opus 5's safeguards flagged this message "
+        "(https://www.anthropic.com/legal/aup). Claude Code can't respond to this message.\n",
+        encoding="utf-8",
+    )
+    agent_run = {"returncode": 1, "timed_out": False, "execution_error": None}
+    reasons = run_all.classify_agent_infrastructure(agent_run, log)
+    assert "agent_refused:claude_aup" in reasons
+    assert "agent_nonzero_exit" not in reasons, "refusal must not double-count as a crash"
+
+    codex_log = tmp_path / "codex_refusal.log"
+    codex_log.write_text("ERROR: This content was flagged for possible cybersecurity risk.\n",
+                         encoding="utf-8")
+    codex_reasons = run_all.classify_agent_infrastructure(
+        {"returncode": 1, "timed_out": False, "execution_error": None}, codex_log
+    )
+    assert "agent_refused:codex_cyber" in codex_reasons
+
+
 def test_teardown_permission_error_does_not_become_an_execution_error() -> None:
     """Regression test for REPORT.md defect 2 (the teardown race).
 

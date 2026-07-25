@@ -14,9 +14,11 @@ scrutiny your ABC work applies to existing benchmarks: a claim that is *fair*,
 *mechanically decided*, *resampled*, *reproducible*, and *scoped*.
 
 So this document specifies the **admissibility protocol** first, and treats the tasks as
-instances of it. A task is admitted to the suite only if it passes every gate below. Seven were
-built: five in the first pass (A–E), and two more (F, G) added after an audit, once it was clear
-that the first pass had found no fair capability gap. The organizing idea is one distinction:
+instances of it. A task is admitted to the suite only if it passes every gate below. Nine were
+built: five in the first pass (A–E); three more (F, G, H) added to hunt for a capability gap once the
+first pass found none, all of which were solved; and one (I, offensive-security exploit chaining)
+that both agents refuse on policy rather than fail on capability (see REPORT.md, "Two more gap
+hunts"). The organizing idea is one distinction:
 
 > **Shape vs. substance.** Every task exposes the agent to a *weak, visible* signal
 > (example tests it can run and iterate against) and is decided by a *strong, hidden,

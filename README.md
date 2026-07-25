@@ -11,6 +11,11 @@ exception to this suite's own admissibility gates. Two of the seven tasks were b
 to find a capability gap, after the first five failed to; both were solved. The honest negative
 result, and the evidence that makes it checkable, is the submission.
 
+Two further tasks were added afterward (their own runs): **H** (asymptotic scale-blindness) — solved
+10/10, a third purpose-built gap hunt defeated — and **I** (offensive-security exploit chaining), the
+one task neither agent completes, because **both platforms refuse it on safety grounds** rather than
+for lack of capability. See `REPORT.md`, "Two more gap hunts."
+
 **The finding I did not plan:** auditing all 70 transcripts of an earlier run revealed that the
 harness's own sandbox had disabled Claude Fable's shell in every one of its trials that left a readable transcript — 26 of 26 — it could not run the
 visible tests, a solver, or any command at all — and it produced a verifier-passing artifact in
@@ -27,16 +32,15 @@ checkable. Written up in `REPORT.md` under "Three defects in my own harness."
   pre-registered tasks I would build next.
 - [`TASK_SPECIFICATION.md`](TASK_SPECIFICATION.md) — the admissibility protocol (12 gates) and
   evaluation design.
-- [`evidence/runs/`](evidence/runs/) — committed provenance for **both** runs: manifest, preflight
-  (grader-validity gates and the live tooling check), and all 70 trial verdicts each. Every number in
-  the report regenerates from these directories.
+- [`evidence/runs/`](evidence/runs/) — committed provenance for every run: the two main runs (all 70
+  verdicts each) plus the standalone Task H and Task I runs. Every number in the report regenerates
+  from these directories.
 - [`evidence/`](evidence/) — the original in-process verifier, the observed frame-introspection
   exploit against it, and an honest search attempt.
-- [`tasks/`](tasks/) — seven task workspaces with hidden mechanical verifiers and
-  reference/known-bad implementations. F (concurrency correctness, graded by an exhaustive
-  interleaving model checker) and G (timing-safe comparison, graded by a deterministic
-  opcode/AST leak detector) were added after an audit to hunt for a capability gap; both models
-  solved both.
+- [`tasks/`](tasks/) — nine task workspaces with hidden mechanical verifiers and reference/known-bad
+  implementations. A–E are the first pass; F (concurrency), G (timing-safe comparison), and H
+  (asymptotic scale) were built to hunt for a capability gap and all three were solved; I
+  (exploit chaining) is the offensive-security task both agents refuse on policy grounds.
 - [`harness/`](harness/) — isolated execution, aggregation, and regression tests.
 
 ## Setup
@@ -54,11 +58,15 @@ python -m pip install -r requirements.txt
 No agent runs or API access needed — this reads the committed evidence:
 
 ```bash
-# the reported clean run
+# the reported clean run (7 tasks A-G)
 python harness/aggregate.py --run-dir evidence/runs/20260725T030646.540246Z-f40db469
 
 # the earlier defective run, retained so the before/after comparison is checkable
 python harness/aggregate.py --run-dir evidence/runs/20260724T150421.630439Z-545ef5ed
+
+# the two follow-up tasks (own runs): H (scale, solved) and I (exploit chain, refused)
+python harness/aggregate.py --run-dir evidence/runs/20260725T152301.243134Z-d7bb0572
+python harness/aggregate.py --run-dir evidence/runs/20260725T162204.945673Z-16ac1626
 ```
 
 The aggregator verifies each bundle's SHA-256 digests and the run's isolation attestation before it
@@ -81,7 +89,9 @@ for task in \
   D_invariant \
   E_preimage \
   F_concurrency \
-  G_timing_safe
+  G_timing_safe \
+  H_asymptotic \
+  I_exploit_chain
 do
   python "tasks/${task}/verifier/verify.py" --self-test
 done

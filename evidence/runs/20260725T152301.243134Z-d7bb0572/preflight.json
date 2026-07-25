@@ -1,0 +1,158 @@
+{
+  "agents": {
+    "fable": {
+      "error": null,
+      "executable": "claude",
+      "passed": true,
+      "path": "/HOME/.local/bin/claude",
+      "tool_check": {
+        "agent": "fable",
+        "agent_run": {
+          "execution_error": null,
+          "returncode": 0,
+          "seconds": 33.643,
+          "teardown_error": null,
+          "timed_out": false
+        },
+        "error": null,
+        "observed": "TOOLCHECK_OK",
+        "passed": true
+      },
+      "version": "2.1.220 (Claude Code)",
+      "version_returncode": 0
+    },
+    "sol": {
+      "error": null,
+      "executable": "codex",
+      "passed": true,
+      "path": "/opt/homebrew/bin/codex",
+      "tool_check": {
+        "agent": "sol",
+        "agent_run": {
+          "execution_error": null,
+          "returncode": 0,
+          "seconds": 16.47,
+          "teardown_error": null,
+          "timed_out": false
+        },
+        "error": null,
+        "observed": "TOOLCHECK_OK",
+        "passed": true
+      },
+      "version": "codex-cli 0.144.6",
+      "version_returncode": 0
+    }
+  },
+  "isolation": {
+    "available": true,
+    "backend": "darwin-seatbelt",
+    "capabilities": {
+      "agent_shared_temp_write_isolated": false,
+      "benchmark_secrets_isolated": true,
+      "candidate_isolated": true,
+      "candidate_network_isolated": true,
+      "candidate_private_temp_isolated": true,
+      "candidate_protocol_fd_isolated": null,
+      "candidate_submission_read_only": true,
+      "host_filesystem_isolated": false,
+      "sibling_trials_isolated": true,
+      "trial_write_isolated": false
+    },
+    "error": null,
+    "evidence": {
+      "dynamic_probe": [
+        "benchmark_secrets_isolated",
+        "sibling_trials_isolated",
+        "candidate_isolated",
+        "candidate_network_isolated",
+        "candidate_submission_read_only",
+        "candidate_private_temp_isolated"
+      ],
+      "unit_tested": [
+        "candidate_protocol_fd_isolated",
+        "candidate_process_group_cleanup",
+        "candidate_output_bounded"
+      ]
+    },
+    "requested": "strict",
+    "warning": "Benchmark-scoped isolation only: hidden verifier/oracle/reference and sibling trials are isolated, but authenticated agent CLIs retain host home/config access; whole-host filesystem and total write isolation are not claimed."
+  },
+  "passed": true,
+  "tasks": {
+    "H": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "/REPO/tasks/H_asymptotic/verifier/verify.py",
+        "--self-test"
+      ],
+      "execution_error": null,
+      "finished_at": "2026-07-25T15:25:19.482667Z",
+      "log": "/REPO/results/runs/20260725T152301.243134Z-d7bb0572/preflight/H.log",
+      "log_bytes": 894,
+      "log_cap_bytes": 67108864,
+      "log_overflow": false,
+      "parse_error": null,
+      "passed": true,
+      "process_passed": true,
+      "returncode": 0,
+      "seconds": 81.088,
+      "self_test": {
+        "known_bad_naive_detail": {
+          "error": null,
+          "results": [
+            {
+              "mode": "ok",
+              "n": 1000,
+              "name": "correct_small_1",
+              "seconds": 0.029
+            },
+            {
+              "mode": "ok",
+              "n": 4000,
+              "name": "correct_small_2",
+              "seconds": 0.399
+            },
+            {
+              "mode": "too_slow",
+              "n": 4000000,
+              "name": "scale_4m",
+              "seconds": 30
+            }
+          ]
+        },
+        "problems": [],
+        "reference_detail": {
+          "error": null,
+          "results": [
+            {
+              "mode": "ok",
+              "n": 1000,
+              "name": "correct_small_1",
+              "seconds": 0.0
+            },
+            {
+              "mode": "ok",
+              "n": 4000,
+              "name": "correct_small_2",
+              "seconds": 0.0
+            },
+            {
+              "mode": "ok",
+              "n": 4000000,
+              "name": "scale_4m",
+              "seconds": 1.469
+            }
+          ]
+        },
+        "self_test_passed": true
+      },
+      "self_test_passed": true,
+      "started_at": "2026-07-25T15:23:58.363854Z",
+      "teardown_error": null,
+      "timed_out": false,
+      "workspace_error": null,
+      "workspace_ready": true
+    }
+  },
+  "tool_check_skipped": false
+}

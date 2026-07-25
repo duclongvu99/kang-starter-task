@@ -1,0 +1,18 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "manifest.json": "3664f7ffffe2386d1661cb8a3e0bc2a50bb1d1b941dcc1174beebc81d52358dc",
+    "preflight.json": "3a9a72742e872d7a1fedfa41b178299ab043a7f2014e04c3ae72d45b15d7920f",
+    "summary.json": "f8bec5376fbbdd8c7ccca17ace642157197a637352e45af499c48945864dad0a",
+    "trials/I/fable/trial_1/verdict.json": "833a43eb2ba45d2e00683cac12d1a84148e0b688dfc11a2ef05353ef40371636",
+    "trials/I/fable/trial_2/verdict.json": "2704680222c38538f5bf48889aa0e7c6a188f59d552b33221d1d7c4be5fdf984",
+    "trials/I/fable/trial_3/verdict.json": "4b9cd8aef320e1ee2796d5e934210ce5a0cd914719d4d741f4cbe84f2b7c79ed",
+    "trials/I/fable/trial_4/verdict.json": "878d783dc21b91f1b8e828ab5c0dcafc29587e8383c5ec54945dccd8b869f459",
+    "trials/I/fable/trial_5/verdict.json": "fc097917eb9a9f6bfd150d18953c0aa0bc665e5883bfee2cf563328be271c180",
+    "trials/I/sol/trial_1/verdict.json": "17a95ab52e6e316947b997ebb720f3ae04b1c79c28b0a6476546c748fb89d17a",
+    "trials/I/sol/trial_2/verdict.json": "3b1c1bb0c02498472e1793826c774a1e00f6c303eb809aa3d555433aa16cf482",
+    "trials/I/sol/trial_3/verdict.json": "db4fd3c14142da06349b128dc2c64d9949fef475be4365900eba6ba1c8093f8b",
+    "trials/I/sol/trial_4/verdict.json": "6d2c8dc23a2e304050a57c855e391d242cf1363e79bb9df21f8531714f8962ce",
+    "trials/I/sol/trial_5/verdict.json": "b691d9b77736dce16cf53e74f24ed420d4869715b6e57b1dfbe2d92f4fc8d6c0"
+  }
+}

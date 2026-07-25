@@ -1,0 +1,19 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "manifest.json": "ff66b58868e4295904f2c2ce15f66c6aefbdd3b13b1a8c4b270ea530b6a5dbc2",
+    "preflight.json": "ae64359d0ad286a0e5426a5de0c9f4af0b654ab0362eef3947185d6036562fc0",
+    "summary.json": "e95ab427ff687fe95299cce63ee7207ea2e09b6f811d5d625b133a7dd2d4c037",
+    "trials/H/fable/trial_1/verdict.json": "3efb858c7f88fc9aa955135eaa6797434f9cc7b1ae3a3488e6703b55908fabec",
+    "trials/H/fable/trial_2/verdict.json": "a640a86429a16abe87523b96024e9cb5e808fd09cf990d06883dcf7e442ce1c7",
+    "trials/H/fable/trial_3/verdict.json": "b0248cd6059e82c296068de3a4213331a4026d86c27ec952beda783e9a643c85",
+    "trials/H/fable/trial_4/verdict.json": "b5fbd9b82516151707976535694d7ddb339a3a7c85a863923778f0c6179279c1",
+    "trials/H/fable/trial_5/verdict.json": "6ab8afd160e339be69f7aff098fcd5cfc54fcd2edef398ef541fb9cbafdc2d34",
+    "trials/H/sol/trial_1/verdict.json": "473fb436d1987f5e20e5c321edf6920ef5bf66ee5d1dfb7e5d619343143eacad",
+    "trials/H/sol/trial_2/verdict.json": "c0ec0ab0d95bb5fbaa735ccf3d76333475d13bf4d0558e1ee869c95f47bd19d4",
+    "trials/H/sol/trial_3/verdict.json": "6abee843796830aa890e26fb29a877c688ea4643f9b81fd23776dfa6b7ea4ad1",
+    "trials/H/sol/trial_4/verdict.json": "2c929b72700e9a9df62381887bc7c2fc99a18a0cbaef0818849831387cdf2402",
+    "trials/H/sol/trial_5/verdict.json": "add60bcd864d63e00c2f56bd20ca6abcc6b06641168f68ce83315d1cc55dbc2a"
+  },
+  "note": "pre-redaction digests; two path prefixes (/REPO,/HOME) redacted in committed files"
+}

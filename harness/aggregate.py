@@ -16,6 +16,10 @@ TASK_LABEL = {
     "C": "C: Z3-certified optimization",
     "D": "D: loop-invariant synthesis",
     "E": "E: preimage (search-hard)",
+    "F": "F: concurrency correctness",
+    "G": "G: timing-safe comparison",
+    "H": "H: asymptotic trap (scale)",
+    "I": "I: exploit-chain (logic flaws)",
 }
 
 
