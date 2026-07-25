@@ -1,0 +1,1523 @@
+{
+  "summary": {
+    "A": {
+      "fable": {
+        "artifact_passes": 5,
+        "avg_agent_seconds": 149.565,
+        "failure_modes": {},
+        "infra_errors": 0,
+        "success_rate": 1.0,
+        "successes": 5,
+        "total_trials": 5,
+        "valid_attempts": 5
+      },
+      "sol": {
+        "artifact_passes": 5,
+        "avg_agent_seconds": 166.447,
+        "failure_modes": {},
+        "infra_errors": 0,
+        "success_rate": 1.0,
+        "successes": 5,
+        "total_trials": 5,
+        "valid_attempts": 5
+      }
+    },
+    "B": {
+      "fable": {
+        "artifact_passes": 5,
+        "avg_agent_seconds": 150.544,
+        "failure_modes": {},
+        "infra_errors": 0,
+        "success_rate": 1.0,
+        "successes": 5,
+        "total_trials": 5,
+        "valid_attempts": 5
+      },
+      "sol": {
+        "artifact_passes": 5,
+        "avg_agent_seconds": 163.01,
+        "failure_modes": {},
+        "infra_errors": 0,
+        "success_rate": 1.0,
+        "successes": 5,
+        "total_trials": 5,
+        "valid_attempts": 5
+      }
+    },
+    "C": {
+      "fable": {
+        "artifact_passes": 5,
+        "avg_agent_seconds": 901.037,
+        "failure_modes": {},
+        "infra_errors": 0,
+        "success_rate": 0.0,
+        "successes": 0,
+        "total_trials": 5,
+        "valid_attempts": 5
+      },
+      "sol": {
+        "artifact_passes": 5,
+        "avg_agent_seconds": 481.661,
+        "failure_modes": {},
+        "infra_errors": 0,
+        "success_rate": 1.0,
+        "successes": 5,
+        "total_trials": 5,
+        "valid_attempts": 5
+      }
+    },
+    "D": {
+      "fable": {
+        "artifact_passes": 5,
+        "avg_agent_seconds": 92.795,
+        "failure_modes": {},
+        "infra_errors": 0,
+        "success_rate": 1.0,
+        "successes": 5,
+        "total_trials": 5,
+        "valid_attempts": 5
+      },
+      "sol": {
+        "artifact_passes": 5,
+        "avg_agent_seconds": 124.863,
+        "failure_modes": {},
+        "infra_errors": 0,
+        "success_rate": 1.0,
+        "successes": 5,
+        "total_trials": 5,
+        "valid_attempts": 5
+      }
+    },
+    "E": {
+      "fable": {
+        "artifact_passes": 0,
+        "avg_agent_seconds": 871.078,
+        "failure_modes": {
+          "crash:NotImplementedError:": 1,
+          "honest_giveup": 2,
+          "timeout_no_answer": 2
+        },
+        "infra_errors": 0,
+        "success_rate": 0.0,
+        "successes": 0,
+        "total_trials": 5,
+        "valid_attempts": 5
+      },
+      "sol": {
+        "artifact_passes": 0,
+        "avg_agent_seconds": 380.979,
+        "failure_modes": {
+          "honest_giveup": 5
+        },
+        "infra_errors": 0,
+        "success_rate": 0.0,
+        "successes": 0,
+        "total_trials": 5,
+        "valid_attempts": 5
+      }
+    },
+    "F": {
+      "fable": {
+        "artifact_passes": 5,
+        "avg_agent_seconds": 196.857,
+        "failure_modes": {},
+        "infra_errors": 0,
+        "success_rate": 1.0,
+        "successes": 5,
+        "total_trials": 5,
+        "valid_attempts": 5
+      },
+      "sol": {
+        "artifact_passes": 5,
+        "avg_agent_seconds": 194.331,
+        "failure_modes": {},
+        "infra_errors": 0,
+        "success_rate": 1.0,
+        "successes": 5,
+        "total_trials": 5,
+        "valid_attempts": 5
+      }
+    },
+    "G": {
+      "fable": {
+        "artifact_passes": 5,
+        "avg_agent_seconds": 99.963,
+        "failure_modes": {},
+        "infra_errors": 0,
+        "success_rate": 1.0,
+        "successes": 5,
+        "total_trials": 5,
+        "valid_attempts": 5
+      },
+      "sol": {
+        "artifact_passes": 5,
+        "avg_agent_seconds": 146.217,
+        "failure_modes": {},
+        "infra_errors": 0,
+        "success_rate": 1.0,
+        "successes": 5,
+        "total_trials": 5,
+        "valid_attempts": 5
+      }
+    }
+  },
+  "trials": [
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 139.459,
+      "status_reason": [
+        "success"
+      ],
+      "task": "A",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 162.179,
+      "status_reason": [
+        "success"
+      ],
+      "task": "A",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 161.425,
+      "status_reason": [
+        "success"
+      ],
+      "task": "A",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 158.432,
+      "status_reason": [
+        "success"
+      ],
+      "task": "A",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 126.328,
+      "status_reason": [
+        "success"
+      ],
+      "task": "A",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 164.585,
+      "status_reason": [
+        "success"
+      ],
+      "task": "A",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 163.542,
+      "status_reason": [
+        "success"
+      ],
+      "task": "A",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 106.354,
+      "status_reason": [
+        "success"
+      ],
+      "task": "A",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 171.569,
+      "status_reason": [
+        "success"
+      ],
+      "task": "A",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 226.183,
+      "status_reason": [
+        "success"
+      ],
+      "task": "A",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 109.575,
+      "status_reason": [
+        "success"
+      ],
+      "task": "B",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 122.098,
+      "status_reason": [
+        "success"
+      ],
+      "task": "B",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 167.517,
+      "status_reason": [
+        "success"
+      ],
+      "task": "B",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 189.239,
+      "status_reason": [
+        "success"
+      ],
+      "task": "B",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 164.292,
+      "status_reason": [
+        "success"
+      ],
+      "task": "B",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 215.857,
+      "status_reason": [
+        "success"
+      ],
+      "task": "B",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 121.617,
+      "status_reason": [
+        "success"
+      ],
+      "task": "B",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 122.528,
+      "status_reason": [
+        "success"
+      ],
+      "task": "B",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 188.326,
+      "status_reason": [
+        "success"
+      ],
+      "task": "B",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 166.721,
+      "status_reason": [
+        "success"
+      ],
+      "task": "B",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -9,
+      "seconds": 901.028,
+      "status_reason": [
+        "agent_timeout"
+      ],
+      "task": "C",
+      "timed_out": true,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -9,
+      "seconds": 901.034,
+      "status_reason": [
+        "agent_timeout"
+      ],
+      "task": "C",
+      "timed_out": true,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -9,
+      "seconds": 901.032,
+      "status_reason": [
+        "agent_timeout"
+      ],
+      "task": "C",
+      "timed_out": true,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -9,
+      "seconds": 901.061,
+      "status_reason": [
+        "agent_timeout"
+      ],
+      "task": "C",
+      "timed_out": true,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -9,
+      "seconds": 901.03,
+      "status_reason": [
+        "agent_timeout"
+      ],
+      "task": "C",
+      "timed_out": true,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 493.529,
+      "status_reason": [
+        "success"
+      ],
+      "task": "C",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 178.308,
+      "status_reason": [
+        "success"
+      ],
+      "task": "C",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 823.761,
+      "status_reason": [
+        "success"
+      ],
+      "task": "C",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 218.827,
+      "status_reason": [
+        "success"
+      ],
+      "task": "C",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 693.878,
+      "status_reason": [
+        "success"
+      ],
+      "task": "C",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 104.877,
+      "status_reason": [
+        "success"
+      ],
+      "task": "D",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 86.925,
+      "status_reason": [
+        "success"
+      ],
+      "task": "D",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 81.974,
+      "status_reason": [
+        "success"
+      ],
+      "task": "D",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 102.537,
+      "status_reason": [
+        "success"
+      ],
+      "task": "D",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 87.66,
+      "status_reason": [
+        "success"
+      ],
+      "task": "D",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 70.929,
+      "status_reason": [
+        "success"
+      ],
+      "task": "D",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 89.467,
+      "status_reason": [
+        "success"
+      ],
+      "task": "D",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 192.983,
+      "status_reason": [
+        "success"
+      ],
+      "task": "D",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 174.07,
+      "status_reason": [
+        "success"
+      ],
+      "task": "D",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 96.866,
+      "status_reason": [
+        "success"
+      ],
+      "task": "D",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "crash:NotImplementedError:"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -9,
+      "seconds": 901.054,
+      "status_reason": [
+        "agent_timeout",
+        "artifact_failed_verifier"
+      ],
+      "task": "E",
+      "timed_out": true,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "honest_giveup"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 0,
+      "seconds": 816.213,
+      "status_reason": [
+        "artifact_failed_verifier"
+      ],
+      "task": "E",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "honest_giveup"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 143,
+      "seconds": 901.033,
+      "status_reason": [
+        "agent_timeout",
+        "artifact_failed_verifier"
+      ],
+      "task": "E",
+      "timed_out": true,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "timeout_no_answer"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 143,
+      "seconds": 900.688,
+      "status_reason": [
+        "agent_timeout",
+        "artifact_failed_verifier"
+      ],
+      "task": "E",
+      "timed_out": true,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "timeout_no_answer"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 0,
+      "seconds": 836.404,
+      "status_reason": [
+        "artifact_failed_verifier"
+      ],
+      "task": "E",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "honest_giveup"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 0,
+      "seconds": 361.767,
+      "status_reason": [
+        "artifact_failed_verifier"
+      ],
+      "task": "E",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "honest_giveup"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 0,
+      "seconds": 304.267,
+      "status_reason": [
+        "artifact_failed_verifier"
+      ],
+      "task": "E",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "honest_giveup"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 0,
+      "seconds": 435.308,
+      "status_reason": [
+        "artifact_failed_verifier"
+      ],
+      "task": "E",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "honest_giveup"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 0,
+      "seconds": 451.785,
+      "status_reason": [
+        "artifact_failed_verifier"
+      ],
+      "task": "E",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "honest_giveup"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 0,
+      "seconds": 351.766,
+      "status_reason": [
+        "artifact_failed_verifier"
+      ],
+      "task": "E",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 198.171,
+      "status_reason": [
+        "success"
+      ],
+      "task": "F",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 230.473,
+      "status_reason": [
+        "success"
+      ],
+      "task": "F",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 192.973,
+      "status_reason": [
+        "success"
+      ],
+      "task": "F",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 181.322,
+      "status_reason": [
+        "success"
+      ],
+      "task": "F",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 181.348,
+      "status_reason": [
+        "success"
+      ],
+      "task": "F",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 149.475,
+      "status_reason": [
+        "success"
+      ],
+      "task": "F",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 157.935,
+      "status_reason": [
+        "success"
+      ],
+      "task": "F",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 229.118,
+      "status_reason": [
+        "success"
+      ],
+      "task": "F",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 215.573,
+      "status_reason": [
+        "success"
+      ],
+      "task": "F",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 219.555,
+      "status_reason": [
+        "success"
+      ],
+      "task": "F",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 98.394,
+      "status_reason": [
+        "success"
+      ],
+      "task": "G",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 93.898,
+      "status_reason": [
+        "success"
+      ],
+      "task": "G",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 91.363,
+      "status_reason": [
+        "success"
+      ],
+      "task": "G",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 105.303,
+      "status_reason": [
+        "success"
+      ],
+      "task": "G",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 110.856,
+      "status_reason": [
+        "success"
+      ],
+      "task": "G",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 155.441,
+      "status_reason": [
+        "success"
+      ],
+      "task": "G",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 295.251,
+      "status_reason": [
+        "agent_infra_suspected:network",
+        "agent_infra_suspected:api_unavailable",
+        "success"
+      ],
+      "task": "G",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 152.979,
+      "status_reason": [
+        "agent_infra_suspected:network",
+        "agent_infra_suspected:api_unavailable",
+        "success"
+      ],
+      "task": "G",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 83.74,
+      "status_reason": [
+        "success"
+      ],
+      "task": "G",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": true,
+      "failure_modes": [],
+      "infra_error": false,
+      "passed": true,
+      "primary_success": true,
+      "returncode": 0,
+      "seconds": 43.676,
+      "status_reason": [
+        "success"
+      ],
+      "task": "G",
+      "timed_out": false,
+      "trial": 5,
+      "trial_valid": true,
+      "verifier_completed": true
+    }
+  ]
+}

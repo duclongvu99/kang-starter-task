@@ -38,7 +38,10 @@ def _capabilities(value: bool | None) -> dict[str, bool | None]:
         # Native authenticated agent CLIs retain host home/config access.
         "host_filesystem_isolated": False,
         "trial_write_isolated": False,
-        "agent_shared_temp_write_isolated": False if value is False else None,
+        # Never claimed: the agent CLI's own runtime-state directory under the shared
+        # temp root is writable and shared across trials, because denying it disables
+        # the agent's shell outright (see agent_cli_state_roots).
+        "agent_shared_temp_write_isolated": False,
     }
 
 
@@ -125,6 +128,27 @@ def _shared_temp_roots() -> list[Path]:
     return sorted((path for path in candidates if path.exists()), key=str)
 
 
+def agent_cli_state_roots() -> list[Path]:
+    """Shared-temp directories an authenticated agent CLI needs in order to function.
+
+    Claude Code creates its shell-snapshot directory at a fixed ``<tmp>/claude-<uid>``
+    path that ignores ``TMPDIR``. Denying writes to the shared temp roots therefore
+    disabled its Bash tool entirely, with a `returncode` of 0 and no other signal --
+    the defect documented in REPORT.md, where 22 of 35 trials for one agent ran with
+    no ability to execute anything and were still scored as valid.
+
+    These paths are agent-CLI runtime state, never benchmark data. Allowing them costs
+    write-isolation of that shared directory *between* trials, which is reported
+    honestly as ``agent_shared_temp_write_isolated: False`` rather than silently.
+    """
+    uid = os.getuid()
+    roots: list[Path] = []
+    for base in _shared_temp_roots():
+        candidate = base / f"claude-{uid}"
+        roots.append(candidate)
+    return roots
+
+
 def agent_profile(sandbox: Path, private_temp: Path | None = None) -> str:
     """Workspace-scoped agent policy.
 
@@ -140,21 +164,27 @@ def agent_profile(sandbox: Path, private_temp: Path | None = None) -> str:
     shared_temp_filters = " ".join(
         f"(subpath {_scheme_string(path)})" for path in _shared_temp_roots()
     )
-    return "\n".join(
-        [
-            "(version 1)",
-            "(allow default)",
-            f"(deny file-read* file-write* (subpath {_scheme_string(WORKSPACE_ROOT)}))",
-            f"(deny file-write* {shared_temp_filters})",
-            f"(allow file-read-metadata {metadata})",
-            f"(allow file-read* (literal {_scheme_string(allowed)}))",
-            f"(allow file-read* file-write* (subpath {_scheme_string(allowed)}))",
-            f"(allow file-read* (literal {_scheme_string(VENV_ROOT)}))",
-            f"(allow file-read* (subpath {_scheme_string(VENV_ROOT)}))",
-            f"(allow file-read* file-write* (literal {_scheme_string(private)}))",
-            f"(allow file-read* file-write* (subpath {_scheme_string(private)}))",
-        ]
-    )
+    rules = [
+        "(version 1)",
+        "(allow default)",
+        f"(deny file-read* file-write* (subpath {_scheme_string(WORKSPACE_ROOT)}))",
+        f"(deny file-write* {shared_temp_filters})",
+        f"(allow file-read-metadata {metadata})",
+        f"(allow file-read* (literal {_scheme_string(allowed)}))",
+        f"(allow file-read* file-write* (subpath {_scheme_string(allowed)}))",
+        f"(allow file-read* (literal {_scheme_string(VENV_ROOT)}))",
+        f"(allow file-read* (subpath {_scheme_string(VENV_ROOT)}))",
+        f"(allow file-read* file-write* (literal {_scheme_string(private)}))",
+        f"(allow file-read* file-write* (subpath {_scheme_string(private)}))",
+    ]
+    # Re-allow only the agent CLI's own runtime-state directory inside the shared
+    # temp roots denied above. Without this the agent's shell cannot start at all.
+    for state_root in agent_cli_state_roots():
+        parent = state_root.parent
+        rules.append(f"(allow file-write* (literal {_scheme_string(parent)}))")
+        rules.append(f"(allow file-read* file-write* (literal {_scheme_string(state_root)}))")
+        rules.append(f"(allow file-read* file-write* (subpath {_scheme_string(state_root)}))")
+    return "\n".join(rules)
 
 
 def _runtime_root(runtime_python: Path) -> Path:

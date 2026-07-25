@@ -78,23 +78,25 @@ can check construct validity rather than a correlated proxy (e.g. tool-syntax fl
   therefore an unfair grader. Added as a second gap hunt, in a security-relevant area where
   "looks right" and "is right" come apart.
 
-The empirical result (see `REPORT.md`), from one 70-trial run: for Fable and GPT-5.6 Sol,
-category (i) is **empty across all six category-(i) tasks** — A, B, D, F and G were solved
-cleanly by both agents, and C is solved by both on the artifact but usually exceeds the 900 s
-budget (a speed limit, not a capability gap) — so E, the declared category-(ii) exception, is
-the only task that holds. That finding, not a contrived "unbeatable" task, is the contribution.
+The empirical result (see `REPORT.md`), from a 70-trial run: for Fable and GPT-5.6 Sol, category (i)
+is **empty across all six category-(i) tasks** — A, B, D, F and G were solved cleanly by both agents,
+and all ten C trials produced a verifier-passing artifact, though only Sol finished C inside the 900 s
+budget (a speed limit, not a capability gap, and the suite's only discrimination between the two
+agents) — so E, the declared category-(ii) exception, is the only task that holds. That finding, not a contrived "unbeatable" task, is the contribution.
 Task F also rules out the obvious deflationary explanation: it is not merely that these agents
 can reconstruct a checker and iterate against it, because in F they cannot, and they still
 succeeded. Task G is a weaker instance of the same result: the canonical answer is one stdlib
 call, so its negative result carries correspondingly less weight, and I say so rather than
 counting seven tasks as seven pieces of evidence.
 
-An accident in that run reinforced the same conclusion from the opposite direction: the harness's
-sandbox profile disabled one agent's shell in 22 of its 35 trials, so it could not execute the
-visible tests, a solver, or any code at all — and it still produced verifier-passing artifacts in
+An accident in an earlier run reinforced the same conclusion from the opposite direction: the
+harness's sandbox profile disabled one agent's shell in every trial of its that left a readable transcript (26 of 26), so it could not execute
+the visible tests, a solver, or any code at all — and it still produced verifier-passing artifacts in
 every one of those trials. That is the strongest available evidence that success on these tasks is
-reasoning from the specification rather than iteration against a signal. It is also a validity
-failure of this protocol, which is why gate **G12(e)** now exists.
+reasoning from the specification rather than iteration against a signal. It was also a validity
+failure of this protocol, which is why gate **G12(e)** now exists and is enforced; the fix was
+confirmed by re-running everything, after which the affected agent was 51-67% faster on four tasks
+while the unaffected agent did not move.
 
 ---
 
@@ -172,10 +174,14 @@ author is structurally least likely to catch: the harness's sandbox profile sile
 agent's shell in most of its trials, and because those trials still *passed*, nothing in the
 pipeline objected. A validity check that only fires on failures is not a validity check.
 
-The run reported in `REPORT.md` violates (b), (c) and (e) — see "Three defects in my own harness"
-there. The numbers reported are the conservative ones the defective classifier produced; no
-verdict was retroactively edited, and the affected readings are marked uninterpretable rather
-than corrected by hand.
+All five clauses are now implemented and enforced. (a)-(d) are checked per trial; (e) runs in
+preflight, before any trial is scored, and fails the whole run closed if an agent cannot execute a
+command inside its real sandbox — `--skip-tool-check` exists for debugging and records
+`tool_check_skipped: true`, which marks a run as not reportable. The **first** run described in
+`REPORT.md` violated (b), (c) and (e); the reported clean run satisfies all five, with both agents'
+tool checks recorded in `preflight.json`. No verdict from the first run was retroactively edited: its
+numbers stand as its defective classifier produced them, its evidence bundle is still committed, and
+the two runs are compared directly instead.
 
 ---
 
@@ -217,7 +223,9 @@ lets the comparison be about the models, not the harness.
   scoped to it.
 - **Anti-cheat is not optional, and I learned it the hard way.** My first harness for
   Task E ran the candidate in the grader's own process; GPT-5.6 Sol read the planted
-  witness out of that process via stack-frame introspection and passed. The fix (discard
+  witness out of that process via stack-frame introspection in one pilot trial — an exploit
+  attempt against a real vulnerability, not a reproducible pass (see REPORT.md's
+  grader-validity section). The fix (discard
   the witness after construction; grade out-of-process with only public inputs in scope)
   is now part of this protocol: *the deciding secret must not be reachable — in memory or
   on disk — from anything the candidate can execute.* I found this only by reading the

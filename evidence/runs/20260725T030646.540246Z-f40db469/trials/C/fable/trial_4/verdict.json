@@ -1,0 +1,191 @@
+{
+  "agent_run": {
+    "command": [
+      "/usr/bin/sandbox-exec",
+      "-p",
+      "(version 1)\n(allow default)\n(deny file-read* file-write* (subpath \"/HOME/Documents/Long_VD_Infor/l_application\"))\n(deny file-write* (subpath \"/private/tmp\") (subpath \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T\"))\n(allow file-read-metadata (literal \"/HOME/Documents/Long_VD_Infor/l_application\") (literal \"/REPO\") (literal \"/REPO/.venv\") (literal \"/REPO/results\") (literal \"/REPO/results/runs\") (literal \"/REPO/results/runs/20260725T030646.540246Z-f40db469\") (literal \"/REPO/results/runs/20260725T030646.540246Z-f40db469/trials\") (literal \"/REPO/results/runs/20260725T030646.540246Z-f40db469/trials/C\") (literal \"/REPO/results/runs/20260725T030646.540246Z-f40db469/trials/C/fable\") (literal \"/REPO/results/runs/20260725T030646.540246Z-f40db469/trials/C/fable/trial_4\") (literal \"/REPO/results/runs/20260725T030646.540246Z-f40db469/trials/C/fable/trial_4/agent-private\") (literal \"/REPO/results/runs/20260725T030646.540246Z-f40db469/trials/C/fable/trial_4/sandbox\"))\n(allow file-read* (literal \"/REPO/results/runs/20260725T030646.540246Z-f40db469/trials/C/fable/trial_4/sandbox\"))\n(allow file-read* file-write* (subpath \"/REPO/results/runs/20260725T030646.540246Z-f40db469/trials/C/fable/trial_4/sandbox\"))\n(allow file-read* (literal \"/REPO/.venv\"))\n(allow file-read* (subpath \"/REPO/.venv\"))\n(allow file-read* file-write* (literal \"/REPO/results/runs/20260725T030646.540246Z-f40db469/trials/C/fable/trial_4/agent-private\"))\n(allow file-read* file-write* (subpath \"/REPO/results/runs/20260725T030646.540246Z-f40db469/trials/C/fable/trial_4/agent-private\"))\n(allow file-write* (literal \"/private/tmp\"))\n(allow file-read* file-write* (literal \"/private/tmp/claude-501\"))\n(allow file-read* file-write* (subpath \"/private/tmp/claude-501\"))\n(allow file-write* (literal \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T\"))\n(allow file-read* file-write* (literal \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/claude-501\"))\n(allow file-read* file-write* (subpath \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/claude-501\"))",
+      "claude",
+      "-p",
+      "You are an autonomous coding agent working in the current working directory, which contains a self-contained coding task. Read README.md and SPEC.md first, then complete the task by creating/editing files in this directory. Follow every rule stated in README.md exactly. Verify your own work as best you can. Do not ask questions and do not stop early \u2014 produce the complete deliverable, then finish.",
+      "--model",
+      "claude-fable-5",
+      "--dangerously-skip-permissions",
+      "--max-turns",
+      "80"
+    ],
+    "execution_error": null,
+    "finished_at": "2026-07-25T05:00:32.567977Z",
+    "isolation": {
+      "available": true,
+      "backend": "darwin-seatbelt",
+      "capabilities": {
+        "agent_shared_temp_write_isolated": false,
+        "benchmark_secrets_isolated": null,
+        "candidate_isolated": null,
+        "candidate_network_isolated": null,
+        "candidate_private_temp_isolated": null,
+        "candidate_protocol_fd_isolated": null,
+        "candidate_submission_read_only": null,
+        "host_filesystem_isolated": false,
+        "sibling_trials_isolated": null,
+        "trial_write_isolated": false
+      },
+      "error": null,
+      "evidence": {
+        "dynamic_probe": [],
+        "unit_tested": [
+          "candidate_protocol_fd_isolated",
+          "candidate_process_group_cleanup",
+          "candidate_output_bounded"
+        ]
+      },
+      "requested": "strict",
+      "warning": "Benchmark-scoped isolation only: hidden verifier/oracle/reference and sibling trials are isolated, but authenticated agent CLIs retain host home/config access; whole-host filesystem and total write isolation are not claimed."
+    },
+    "log": "/REPO/results/runs/20260725T030646.540246Z-f40db469/trials/C/fable/trial_4/agent.log",
+    "log_bytes": 15,
+    "log_cap_bytes": 67108864,
+    "log_overflow": false,
+    "returncode": -9,
+    "seconds": 901.061,
+    "started_at": "2026-07-25T04:45:31.488498Z",
+    "teardown_error": null,
+    "timed_out": true
+  },
+  "record": {
+    "agent": "fable",
+    "agent_completed": false,
+    "artifact_passed_verifier": true,
+    "failure_modes": [],
+    "infra_error": false,
+    "passed": false,
+    "primary_success": false,
+    "returncode": -9,
+    "seconds": 901.061,
+    "status_reason": [
+      "agent_timeout"
+    ],
+    "task": "C",
+    "timed_out": true,
+    "trial": 4,
+    "trial_valid": true,
+    "verifier_completed": true
+  },
+  "schema_version": 2,
+  "status": {
+    "agent_completed": false,
+    "artifact_passed_verifier": true,
+    "infra_error": false,
+    "primary_success": false,
+    "status_reason": [
+      "agent_timeout"
+    ],
+    "trial_valid": true,
+    "verifier_completed": true
+  },
+  "verdict": {
+    "checks": {
+      "battery": {
+        "details": {
+          "feasible_trap_conflict": {
+            "achieved": 183,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "feasible_trap_cost": {
+            "achieved": 183,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_0": {
+            "achieved": 390,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_1": {
+            "achieved": 292,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_2": {
+            "achieved": 322,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_3": {
+            "kind": "infeasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_4": {
+            "achieved": 198,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_5": {
+            "achieved": 296,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_6": {
+            "kind": "infeasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_7": {
+            "kind": "infeasible",
+            "mode": null,
+            "passed": true
+          },
+          "infeasible_capacity_pigeonhole": {
+            "kind": "infeasible",
+            "mode": null,
+            "passed": true
+          },
+          "infeasible_conflict_forced": {
+            "kind": "infeasible",
+            "mode": null,
+            "passed": true
+          }
+        },
+        "num_cases": 12,
+        "num_failed": 0,
+        "passed": true
+      },
+      "load": {
+        "passed": true
+      }
+    },
+    "failure_modes": [],
+    "passed": true,
+    "task": "C_prove_it"
+  },
+  "verifier_run": {
+    "command": [
+      "/REPO/.venv/bin/python",
+      "/REPO/tasks/C_prove_it/verifier/verify.py",
+      "--submission",
+      "/REPO/results/runs/20260725T030646.540246Z-f40db469/trials/C/fable/trial_4/sandbox"
+    ],
+    "completed": true,
+    "error": null,
+    "execution_error": null,
+    "finished_at": "2026-07-25T05:00:34.002759Z",
+    "log": "/REPO/results/runs/20260725T030646.540246Z-f40db469/trials/C/fable/trial_4/verifier.log",
+    "log_bytes": 1837,
+    "log_cap_bytes": 67108864,
+    "log_overflow": false,
+    "returncode": 0,
+    "seconds": 1.423,
+    "started_at": "2026-07-25T05:00:32.579971Z",
+    "teardown_error": null,
+    "timed_out": false
+  }
+}

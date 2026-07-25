@@ -341,6 +341,105 @@ def test_session_limit_is_invalid_infrastructure_even_with_zero_exit(
     assert "agent_infra_signature:session_limit" in record["status_reason"]
 
 
+def test_ambiguous_infra_word_in_agent_prose_does_not_void_a_clean_trial(
+    tmp_path: Path,
+) -> None:
+    """Regression test for REPORT.md defect 3.
+
+    A trial exited 0 and was voided because the `authentication` pattern matched the word
+    "unauthorized" inside prose an unrelated editor plugin had injected into the agent's
+    context. Content the agent prints must not produce a verdict about the environment
+    unless the harness independently observed a failure.
+    """
+    task = _fake_task(tmp_path)
+    run_dir = tmp_path / "run-prose"
+    run_dir.mkdir()
+    injected = "hooks will DENY unauthorized actions\nI could not find a nonce; giving up.\n"
+
+    def prose_agent(sandbox: Path, budget: int, log_path: Path) -> dict:
+        return _agent_result(log_path, injected, 0)
+
+    verifier_meta = {"completed": True, "error": None, "seconds": 0.1}
+    with (
+        mock.patch.dict(run_all.TASK_DIRS, {"A": task}, clear=True),
+        mock.patch.dict(run_all.AGENTS, {"sol": prose_agent}, clear=True),
+        mock.patch.object(
+            run_all, "grade", return_value=({"passed": False, "failure_modes": ["honest_giveup"]}, verifier_meta)
+        ),
+    ):
+        record = run_all.one_trial("A", "sol", 1, 1, 1, run_dir)
+    assert record["infra_error"] is False
+    assert record["trial_valid"] is True, "a clean exit must stay a valid attempt"
+    assert not any(r.startswith("agent_infra_signature:") for r in record["status_reason"])
+
+
+def test_ambiguous_infra_word_still_voids_when_harness_saw_a_failure(tmp_path: Path) -> None:
+    """The same pattern must keep working when there is real corroboration."""
+    task = _fake_task(tmp_path)
+    run_dir = tmp_path / "run-corroborated"
+    run_dir.mkdir()
+
+    def failing_agent(sandbox: Path, budget: int, log_path: Path) -> dict:
+        return _agent_result(log_path, "authentication failed\n", 1)
+
+    verifier_meta = {"completed": True, "error": None, "seconds": 0.1}
+    with (
+        mock.patch.dict(run_all.TASK_DIRS, {"A": task}, clear=True),
+        mock.patch.dict(run_all.AGENTS, {"sol": failing_agent}, clear=True),
+        mock.patch.object(run_all, "grade", return_value=({"passed": False}, verifier_meta)),
+    ):
+        record = run_all.one_trial("A", "sol", 1, 1, 1, run_dir)
+    assert record["infra_error"] is True
+    assert "agent_infra_signature:authentication" in record["status_reason"]
+
+
+def test_teardown_permission_error_does_not_become_an_execution_error() -> None:
+    """Regression test for REPORT.md defect 2 (the teardown race).
+
+    `killpg(pid, 0)` raising EPERM used to escape into the caller's OSError handler and be
+    recorded as an execution error, so one 900 s timeout scored valid and the next scored
+    invalid depending on which side of a race the kill landed on.
+    """
+    process = mock.Mock()
+    process.pid = 4242
+    process.poll.return_value = None
+    process.wait.return_value = 0
+    result: dict = {"execution_error": None, "teardown_error": None}
+
+    def killpg(pid: int, sig: int) -> None:
+        if sig == 0:
+            raise PermissionError(1, "Operation not permitted")
+
+    with mock.patch.object(run_all.os, "killpg", side_effect=killpg):
+        run_all._teardown_process_group(process, result)
+
+    assert result["execution_error"] is None
+    assert result["teardown_error"] is None
+
+
+def test_tool_check_failure_blocks_the_whole_preflight(tmp_path: Path) -> None:
+    """Gate G12(e): a mute agent must never reach a scored trial, even if trials pass."""
+    task = _fake_task(tmp_path)
+    run_dir = tmp_path / "run-toolcheck"
+    run_dir.mkdir()
+    dead = {
+        "agent": "sol",
+        "passed": False,
+        "observed": "BROKEN",
+        "error": "agent could not execute a shell command in its sandbox",
+    }
+    with (
+        mock.patch.dict(run_all.TASK_DIRS, {"A": task}, clear=True),
+        mock.patch.object(run_all, "_agent_version", return_value=_agent_metadata()),
+        mock.patch.object(run_all, "run_tool_check", return_value=dead),
+    ):
+        report = run_all.run_preflight(["A"], ["sol"], run_dir, 5, None, "host")
+    assert report["passed"] is False
+    assert report["agents"]["sol"]["passed"] is False
+    assert report["agents"]["sol"]["tool_check"]["observed"] == "BROKEN"
+    assert report["tool_check_skipped"] is False
+
+
 def test_aggregation_excludes_invalid_infra_trials_from_denominator(tmp_path: Path) -> None:
     run_dir = _write_completed_run(
         tmp_path,
@@ -624,6 +723,13 @@ def test_unexpected_trial_exception_aborts_and_finalizes_run(tmp_path: Path) -> 
     with (
         mock.patch.dict(run_all.TASK_DIRS, {"A": task}, clear=True),
         mock.patch.object(run_all, "_agent_version", return_value=_agent_metadata()),
+        # The G12(e) tooling check spawns the real agent CLI; this test is about trial
+        # exception handling, so stub it rather than making a live call.
+        mock.patch.object(
+            run_all,
+            "run_tool_check",
+            return_value={"agent": "sol", "passed": True, "observed": "TOOLCHECK_OK", "error": None},
+        ),
         mock.patch.object(run_all, "one_trial", side_effect=RuntimeError("boom")),
     ):
         run_dir, exit_code = run_all.execute(_args(tmp_path / "runs"))

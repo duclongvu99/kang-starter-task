@@ -108,6 +108,12 @@ def _terminate_process_group(process: subprocess.Popen[Any]) -> None:
                 os.killpg(process.pid, 0)
             except ProcessLookupError:
                 break
+            except PermissionError:
+                # The group exists but is not ours to signal. That is a teardown
+                # limitation, not information about the group's liveness, and it must
+                # never propagate: letting it escape is what made one 900 s timeout
+                # score `valid` and the next `invalid` by coin flip (see REPORT.md).
+                break
             time.sleep(0.02)
         try:
             os.killpg(process.pid, signal.SIGKILL)
@@ -155,6 +161,20 @@ def _drain_capped_log(
         state["bytes"] = written
 
 
+def _teardown_process_group(process: subprocess.Popen[Any], result: dict[str, Any]) -> None:
+    """Tear down the child's process group without ever failing the trial.
+
+    Reaping a finished agent tells us nothing about whether the agent did its job, so a
+    teardown problem is recorded in its own field and is never surfaced as an
+    `execution_error`. This is gate G12(c): one underlying event -- a wall-clock timeout --
+    must not receive two different verdicts depending on whether a kill won a race.
+    """
+    try:
+        _terminate_process_group(process)
+    except (OSError, subprocess.SubprocessError) as exc:  # pragma: no cover - defensive
+        result["teardown_error"] = f"{type(exc).__name__}: {exc}"
+
+
 def _run_process(
     cmd: list[str],
     cwd: Path,
@@ -177,6 +197,7 @@ def _run_process(
         "returncode": None,
         "timed_out": False,
         "execution_error": None,
+        "teardown_error": None,
         "log_overflow": False,
         "log_bytes": 0,
         "log_cap_bytes": log_cap_bytes,
@@ -206,10 +227,10 @@ def _run_process(
                 result["returncode"] = process.wait(timeout=timeout)
                 # A CLI can exit after leaving background helpers alive. Kill
                 # those helpers before grading or hashing the sandbox.
-                _terminate_process_group(process)
+                _teardown_process_group(process, result)
             except subprocess.TimeoutExpired:
                 result["timed_out"] = True
-                _terminate_process_group(process)
+                _teardown_process_group(process, result)
                 result["returncode"] = process.returncode
     except (OSError, subprocess.SubprocessError) as exc:
         result["execution_error"] = f"{type(exc).__name__}: {exc}"
@@ -319,8 +340,12 @@ AGENT_INFRA_PATTERNS = {
     "session_limit": re.compile(r"(?:hit|reached|exceeded).{0,40}session limit", re.I | re.S),
     "quota": re.compile(r"(?:quota (?:exceeded|exhausted)|insufficient quota|out of quota)", re.I),
     "rate_limit": re.compile(r"(?:rate[- ]limit(?:ed| exceeded)?|too many requests)", re.I),
+    # "unauthorized" as a bare word was removed: it matched ordinary prose an editor
+    # plugin had injected into an agent's context and voided a valid trial (REPORT.md,
+    # defect 3). A real auth failure names the failure or the status code.
     "authentication": re.compile(
-        r"(?:authentication (?:failed|required|error)|invalid api key|unauthorized|not authenticated)",
+        r"(?:authentication (?:failed|required|error)|invalid api key|not authenticated"
+        r"|\b401\b\s*(?:unauthorized)?|unauthorized:\s)",
         re.I,
     ),
     "network": re.compile(
@@ -344,10 +369,33 @@ AGENT_INFRA_PATTERNS = {
 }
 
 
+# Signatures that only ever come from the platform refusing to serve the agent. These
+# stand on their own: a session limit means the agent was cut off, whatever else happened.
+AUTHORITATIVE_INFRA_SIGNATURES = frozenset(
+    {"session_limit", "quota", "rate_limit", "sandbox_rejected"}
+)
+
+
 def classify_agent_infrastructure(
     agent_run: dict[str, Any], log_path: Path
 ) -> list[str]:
-    """Return infrastructure-failure reasons for an agent invocation."""
+    """Return infrastructure-failure reasons for an agent invocation.
+
+    Gate G12(b): a reason must be derived from the harness's own observations, never from
+    keyword-matching text the agent controls. Log scanning cannot be dropped outright --
+    a session limit or exhausted quota is visible nowhere else -- so the patterns are
+    split by how much the harness can trust them:
+
+    * AUTHORITATIVE_INFRA_SIGNATURES void the trial on their own.
+    * every other pattern is ambiguous enough to appear in ordinary prose, so it voids a
+      trial only when the harness *independently* observed a failure (nonzero exit,
+      timeout, or execution error). Otherwise it is recorded as `agent_infra_suspected:`
+      for the audit trail and changes nothing.
+
+    This is the fix for REPORT.md's defect 3, where the `authentication` pattern matched
+    the word "unauthorized" inside prose an unrelated editor plugin had injected into the
+    agent's context and voided a trial that had exited 0 with nothing wrong with it.
+    """
     reasons: list[str] = []
     if agent_run.get("execution_error"):
         reasons.append("agent_execution_error")
@@ -356,14 +404,23 @@ def classify_agent_infrastructure(
     returncode = agent_run.get("returncode")
     if not agent_run.get("timed_out") and returncode is not None and returncode != 0:
         reasons.append("agent_nonzero_exit")
+    harness_observed_failure = bool(
+        agent_run.get("execution_error")
+        or agent_run.get("timed_out")
+        or (returncode is not None and returncode != 0)
+    )
     try:
         output = log_path.read_text(encoding="utf-8", errors="replace")
     except OSError as exc:
         reasons.append(f"agent_log_unreadable:{type(exc).__name__}")
         return reasons
     for name, pattern in AGENT_INFRA_PATTERNS.items():
-        if pattern.search(output):
+        if not pattern.search(output):
+            continue
+        if name in AUTHORITATIVE_INFRA_SIGNATURES or harness_observed_failure:
             reasons.append(f"agent_infra_signature:{name}")
+        else:
+            reasons.append(f"agent_infra_suspected:{name}")
     return reasons
 
 
@@ -430,6 +487,83 @@ def grade(
     return verdict, meta
 
 
+TOOLCHECK_TOKEN = "TOOLCHECK_OK"
+TOOLCHECK_PROMPT = (
+    "You are in a sandbox. Do exactly this and nothing else: run the shell command "
+    f"`echo {TOOLCHECK_TOKEN}` and write that command's exact stdout into a file named "
+    "toolcheck.txt in the current working directory. If you cannot execute shell commands "
+    "at all, write the single word BROKEN into toolcheck.txt instead."
+)
+
+
+def run_tool_check(
+    agent: str,
+    run_dir: Path,
+    timeout: int,
+    isolation_mode: str,
+) -> dict[str, Any]:
+    """Gate G12(e): prove the agent can actually execute a command in the real sandbox.
+
+    The run reported in REPORT.md scored 22 of one agent's 35 trials as valid while its
+    shell was dead the whole time -- the sandbox profile denied the directory the CLI
+    creates its shell snapshots in, so every command failed, the process still exited 0,
+    and nothing in the pipeline objected because the trials happened to *pass*. A
+    validity check that only fires on failures is not a validity check, so this one runs
+    before any trial is scored and fails the whole preflight if an agent is mute.
+    """
+    root = run_dir / "preflight" / "toolcheck" / agent
+    sandbox = root / "sandbox"
+    sandbox.mkdir(parents=True, exist_ok=True)
+    log_path = root / "agent.log"
+    record: dict[str, Any] = {"agent": agent, "passed": False, "observed": None, "error": None}
+    try:
+        runner = AGENTS.get(agent)
+        if runner is run_fable:
+            cmd = [
+                "claude", "-p", TOOLCHECK_PROMPT, "--model", "claude-fable-5",
+                "--dangerously-skip-permissions", "--max-turns", "12",
+            ]
+        elif runner is run_sol:
+            codex_sandbox = "danger-full-access" if isolation_mode == "strict" else "workspace-write"
+            cmd = [
+                "codex", "exec", TOOLCHECK_PROMPT, "-C", str(sandbox), "-s", codex_sandbox,
+                "--skip-git-repo-check", "-m", "gpt-5.6-sol",
+            ]
+        else:
+            record.update(passed=True, observed="skipped: injected test runner")
+            return record
+
+        runtime_dir = root / "agent-private"
+        runtime_dir.mkdir(parents=True, exist_ok=True)
+        agent_env = dict(AGENT_ENV)
+        agent_env.update(
+            {"TMPDIR": str(runtime_dir), "TMP": str(runtime_dir), "TEMP": str(runtime_dir)}
+        )
+        if isolation_mode == "strict":
+            cmd = process_isolation.wrap_command(
+                cmd,
+                mode="strict",
+                profile=process_isolation.agent_profile(sandbox, runtime_dir),
+            )
+        run = _run_process(cmd, sandbox, timeout, log_path, env=agent_env)
+        record["agent_run"] = {
+            key: run.get(key)
+            for key in ("returncode", "timed_out", "execution_error", "teardown_error", "seconds")
+        }
+        marker = sandbox / "toolcheck.txt"
+        observed = marker.read_text(encoding="utf-8", errors="replace").strip() if marker.is_file() else None
+        record["observed"] = observed
+        record["passed"] = observed == TOOLCHECK_TOKEN
+        if not record["passed"]:
+            record["error"] = (
+                "agent could not execute a shell command in its sandbox "
+                f"(wrote {observed!r} instead of {TOOLCHECK_TOKEN!r})"
+            )
+    except (OSError, subprocess.SubprocessError) as exc:  # pragma: no cover - defensive
+        record["error"] = f"{type(exc).__name__}: {exc}"
+    return record
+
+
 def run_preflight(
     tasks: list[str],
     agents: list[str],
@@ -437,9 +571,11 @@ def run_preflight(
     timeout: int,
     agent_metadata: dict[str, Any] | None = None,
     isolation_mode: str = "host",
+    tool_check: bool = True,
 ) -> dict[str, Any]:
     """Validate agent executables and verifier self-tests before launching trials."""
     agent_records: dict[str, Any] = {}
+    tool_check_skipped = not tool_check
     metadata = agent_metadata or {agent: _agent_version(agent) for agent in agents}
     for agent in agents:
         details = metadata.get(agent, {})
@@ -470,6 +606,13 @@ def run_preflight(
                 )
             ),
         }
+        # G12(e): an agent that cannot run a command must never reach a scored trial.
+        if passed and tool_check:
+            check = run_tool_check(agent, run_dir, timeout, isolation_mode)
+            agent_records[agent]["tool_check"] = check
+            if not check["passed"]:
+                agent_records[agent]["passed"] = False
+                agent_records[agent]["error"] = check["error"] or "agent tool check failed"
 
     task_records: dict[str, Any] = {}
     for task in tasks:
@@ -546,6 +689,9 @@ def run_preflight(
         "agents": agent_records,
         "tasks": task_records,
         "isolation": isolation_record.manifest(),
+        # G12(e) provenance: a run that skipped the live tooling check is explicitly
+        # marked, so it can never be mistaken for a fully validated one.
+        "tool_check_skipped": tool_check_skipped,
     }
     _write_json(run_dir / "preflight.json", records, exclusive=True)
     return records
@@ -588,7 +734,14 @@ def one_trial(
         failure_modes = ["malformed_verifier_failure_modes"]
     verifier_completed = bool(verifier_run.get("completed"))
     agent_infra_reasons = classify_agent_infrastructure(agent_run, agent_log)
-    infra_error = bool(agent_infra_reasons or not verifier_completed)
+    infra_error = bool(
+        [
+            reason
+            for reason in agent_infra_reasons
+            if not reason.startswith("agent_infra_suspected:")
+        ]
+        or not verifier_completed
+    )
     trial_valid = not infra_error
     primary_success = (
         trial_valid and agent_completed and verifier_completed and artifact_passed
@@ -898,6 +1051,7 @@ def execute(args: argparse.Namespace) -> tuple[Path, int]:
             args.preflight_timeout,
             manifest["agents"],
             isolation_mode,
+            tool_check=not getattr(args, "skip_tool_check", False),
         )
         manifest["isolation"] = preflight["isolation"]
         _write_json(run_dir / "manifest.json", manifest)
@@ -1013,6 +1167,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help=(
             "strict uses fail-closed macOS Seatbelt; host is an explicitly unsafe "
             "debug mode recorded in the run manifest"
+        ),
+    )
+    parser.add_argument(
+        "--skip-tool-check",
+        action="store_true",
+        help=(
+            "skip the G12(e) live tooling check (debug only). The check spawns each agent "
+            "once to prove it can execute a command inside the real sandbox; skipping it "
+            "is recorded in preflight.json, and a run that skipped it is not reportable"
         ),
     )
     parser.add_argument(
