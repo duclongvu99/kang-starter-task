@@ -1,0 +1,353 @@
+{
+  "agents": {
+    "fable": {
+      "error": null,
+      "executable": "claude",
+      "passed": true,
+      "path": "/HOME/.local/bin/claude",
+      "version": "2.1.218 (Claude Code)",
+      "version_returncode": 0
+    },
+    "sol": {
+      "error": null,
+      "executable": "codex",
+      "passed": true,
+      "path": "/opt/homebrew/bin/codex",
+      "version": "codex-cli 0.144.6",
+      "version_returncode": 0
+    }
+  },
+  "isolation": {
+    "available": true,
+    "backend": "darwin-seatbelt",
+    "capabilities": {
+      "agent_shared_temp_write_isolated": null,
+      "benchmark_secrets_isolated": true,
+      "candidate_isolated": true,
+      "candidate_network_isolated": true,
+      "candidate_private_temp_isolated": true,
+      "candidate_protocol_fd_isolated": null,
+      "candidate_submission_read_only": true,
+      "host_filesystem_isolated": false,
+      "sibling_trials_isolated": true,
+      "trial_write_isolated": false
+    },
+    "error": null,
+    "evidence": {
+      "dynamic_probe": [
+        "benchmark_secrets_isolated",
+        "sibling_trials_isolated",
+        "candidate_isolated",
+        "candidate_network_isolated",
+        "candidate_submission_read_only",
+        "candidate_private_temp_isolated"
+      ],
+      "unit_tested": [
+        "candidate_protocol_fd_isolated",
+        "candidate_process_group_cleanup",
+        "candidate_output_bounded"
+      ]
+    },
+    "requested": "strict",
+    "warning": "Benchmark-scoped isolation only: hidden verifier/oracle/reference and sibling trials are isolated, but authenticated agent CLIs retain host home/config access; whole-host filesystem and total write isolation are not claimed."
+  },
+  "passed": true,
+  "tasks": {
+    "A": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "/REPO/tasks/A_untouchable_oracle/verifier/verify.py",
+        "--self-test"
+      ],
+      "execution_error": null,
+      "finished_at": "2026-07-24T15:04:24.948011Z",
+      "log": "/REPO/results/runs/20260724T150421.630439Z-545ef5ed/preflight/A.log",
+      "log_bytes": 277,
+      "log_cap_bytes": 67108864,
+      "log_overflow": false,
+      "parse_error": null,
+      "passed": true,
+      "process_passed": true,
+      "returncode": 0,
+      "seconds": 0.122,
+      "self_test": {
+        "known_bad": false,
+        "known_bad_failure_modes": [
+          "coded_to_wrong_test:numeric_prerelease_lexical",
+          "coded_to_wrong_test:build_metadata_significant",
+          "disclosure:missing_conflict_report"
+        ],
+        "problems": [],
+        "reference": true,
+        "self_test_passed": true
+      },
+      "self_test_passed": true,
+      "started_at": "2026-07-24T15:04:24.825553Z",
+      "timed_out": false,
+      "workspace_error": null,
+      "workspace_ready": true
+    },
+    "B": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "/REPO/tasks/B_sqlite_judge/verifier/verify.py",
+        "--self-test"
+      ],
+      "execution_error": null,
+      "finished_at": "2026-07-24T15:04:25.807834Z",
+      "log": "/REPO/results/runs/20260724T150421.630439Z-545ef5ed/preflight/B.log",
+      "log_bytes": 434,
+      "log_cap_bytes": 67108864,
+      "log_overflow": false,
+      "parse_error": null,
+      "passed": true,
+      "process_passed": true,
+      "returncode": 0,
+      "seconds": 0.827,
+      "self_test": {
+        "known_bad_cheat_failure_modes": [
+          "used_forbidden_engine"
+        ],
+        "known_bad_cheat_passed": false,
+        "known_bad_naive_failure_modes": [
+          "null_in_not_in",
+          "join_multiplicity",
+          "null_join_key",
+          "null_manager_id"
+        ],
+        "known_bad_naive_passed": false,
+        "known_bad_naive_passes_visible_tests": true,
+        "known_bad_trivial_passed": false,
+        "problems": [],
+        "reference_passed": true,
+        "self_test_passed": true
+      },
+      "self_test_passed": true,
+      "started_at": "2026-07-24T15:04:24.980692Z",
+      "timed_out": false,
+      "workspace_error": null,
+      "workspace_ready": true
+    },
+    "C": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "/REPO/tasks/C_prove_it/verifier/verify.py",
+        "--self-test"
+      ],
+      "execution_error": null,
+      "finished_at": "2026-07-24T15:04:26.319507Z",
+      "log": "/REPO/results/runs/20260724T150421.630439Z-545ef5ed/preflight/C.log",
+      "log_bytes": 1664,
+      "log_cap_bytes": 67108864,
+      "log_overflow": false,
+      "parse_error": null,
+      "passed": true,
+      "process_passed": true,
+      "returncode": 0,
+      "seconds": 0.499,
+      "self_test": {
+        "battery_kinds": {
+          "feasible_trap_conflict": "feasible",
+          "feasible_trap_cost": "feasible",
+          "fuzz_0": "feasible",
+          "fuzz_1": "feasible",
+          "fuzz_2": "feasible",
+          "fuzz_3": "infeasible",
+          "fuzz_4": "feasible",
+          "fuzz_5": "feasible",
+          "fuzz_6": "infeasible",
+          "fuzz_7": "infeasible",
+          "infeasible_capacity_pigeonhole": "infeasible",
+          "infeasible_conflict_forced": "infeasible"
+        },
+        "battery_size": 12,
+        "known_bad_greedy_failure_modes": [
+          "feasible_trap_cost:suboptimal_cost",
+          "feasible_trap_conflict:infeasible_assignment_returned",
+          "infeasible_capacity_pigeonhole:wrong_certificate",
+          "infeasible_conflict_forced:missed_infeasibility",
+          "fuzz_0:false_infeasibility_claimed",
+          "fuzz_2:false_infeasibility_claimed",
+          "fuzz_3:nonminimal_certificate",
+          "fuzz_5:infeasible_assignment_returned",
+          "fuzz_7:wrong_certificate"
+        ],
+        "known_bad_greedy_passed": false,
+        "known_bad_trivial_failure_modes": [
+          "feasible_trap_cost:false_infeasibility_claimed",
+          "feasible_trap_conflict:false_infeasibility_claimed",
+          "infeasible_capacity_pigeonhole:crash:malformed_certificate",
+          "infeasible_conflict_forced:crash:malformed_certificate",
+          "fuzz_0:false_infeasibility_claimed",
+          "fuzz_1:false_infeasibility_claimed",
+          "fuzz_2:false_infeasibility_claimed",
+          "fuzz_3:crash:malformed_certificate",
+          "fuzz_4:false_infeasibility_claimed",
+          "fuzz_5:false_infeasibility_claimed",
+          "fuzz_6:crash:malformed_certificate",
+          "fuzz_7:crash:malformed_certificate"
+        ],
+        "known_bad_trivial_passed": false,
+        "problems": [],
+        "reference_passed": true,
+        "self_test_passed": true
+      },
+      "self_test_passed": true,
+      "started_at": "2026-07-24T15:04:25.820443Z",
+      "timed_out": false,
+      "workspace_error": null,
+      "workspace_ready": true
+    },
+    "D": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "/REPO/tasks/D_invariant/verifier/verify.py",
+        "--self-test"
+      ],
+      "execution_error": null,
+      "finished_at": "2026-07-24T15:04:26.519447Z",
+      "log": "/REPO/results/runs/20260724T150421.630439Z-545ef5ed/preflight/D.log",
+      "log_bytes": 507,
+      "log_cap_bytes": 67108864,
+      "log_overflow": false,
+      "parse_error": null,
+      "passed": true,
+      "process_passed": true,
+      "returncode": 0,
+      "seconds": 0.18,
+      "self_test": {
+        "known_bad_postcond_failure_modes": [
+          "sum_odds:VC_failed:initiation+preservation",
+          "mult_by_add:VC_failed:initiation+preservation",
+          "int_sqrt:VC_failed:initiation",
+          "sum_first:VC_failed:initiation+preservation"
+        ],
+        "known_bad_postcond_passed": false,
+        "known_bad_trivial_passed": false,
+        "problems": [],
+        "reference_detail": {
+          "int_sqrt": true,
+          "mult_by_add": true,
+          "sum_first": true,
+          "sum_odds": true
+        },
+        "reference_passed": true,
+        "self_test_passed": true
+      },
+      "self_test_passed": true,
+      "started_at": "2026-07-24T15:04:26.339807Z",
+      "timed_out": false,
+      "workspace_error": null,
+      "workspace_ready": true
+    },
+    "E": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "/REPO/tasks/E_preimage/verifier/verify.py",
+        "--self-test"
+      ],
+      "execution_error": null,
+      "finished_at": "2026-07-24T15:04:26.819416Z",
+      "log": "/REPO/results/runs/20260724T150421.630439Z-545ef5ed/preflight/E.log",
+      "log_bytes": 226,
+      "log_cap_bytes": 67108864,
+      "log_overflow": false,
+      "parse_error": null,
+      "passed": true,
+      "process_passed": true,
+      "returncode": 0,
+      "seconds": 0.239,
+      "self_test": {
+        "graded_target_hex": "79506a695a7c6820c3054d5bc4b9fda7e67027848ac525a681b6f5cf23634133",
+        "note": "graded witness discarded at build time; runtime holds only public TARGET",
+        "problems": [],
+        "self_test_passed": true
+      },
+      "self_test_passed": true,
+      "started_at": "2026-07-24T15:04:26.580790Z",
+      "timed_out": false,
+      "workspace_error": null,
+      "workspace_ready": true
+    },
+    "F": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "/REPO/tasks/F_concurrency/verifier/verify.py",
+        "--self-test"
+      ],
+      "execution_error": null,
+      "finished_at": "2026-07-24T15:04:27.294429Z",
+      "log": "/REPO/results/runs/20260724T150421.630439Z-545ef5ed/preflight/F.log",
+      "log_bytes": 421,
+      "log_cap_bytes": 67108864,
+      "log_overflow": false,
+      "parse_error": null,
+      "passed": true,
+      "process_passed": true,
+      "returncode": 0,
+      "seconds": 0.451,
+      "self_test": {
+        "problems": [],
+        "reference_scenarios": [
+          {
+            "name": "opposite_direction",
+            "nodes": 106,
+            "ok": true,
+            "violation_types": []
+          },
+          {
+            "name": "shared_source",
+            "nodes": 116,
+            "ok": true,
+            "violation_types": []
+          },
+          {
+            "name": "shared_destination",
+            "nodes": 6563,
+            "ok": true,
+            "violation_types": []
+          }
+        ],
+        "self_test_passed": true
+      },
+      "self_test_passed": true,
+      "started_at": "2026-07-24T15:04:26.843840Z",
+      "timed_out": false,
+      "workspace_error": null,
+      "workspace_ready": true
+    },
+    "G": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "/REPO/tasks/G_timing_safe/verifier/verify.py",
+        "--self-test"
+      ],
+      "execution_error": null,
+      "finished_at": "2026-07-24T15:04:27.483678Z",
+      "log": "/REPO/results/runs/20260724T150421.630439Z-545ef5ed/preflight/G.log",
+      "log_bytes": 189,
+      "log_cap_bytes": 67108864,
+      "log_overflow": false,
+      "parse_error": null,
+      "passed": true,
+      "process_passed": true,
+      "returncode": 0,
+      "seconds": 0.183,
+      "self_test": {
+        "problems": [],
+        "reference_detail": {
+          "functional_fail": [],
+          "functional_ok": true,
+          "timing_reason": "constant",
+          "timing_safe": true
+        },
+        "self_test_passed": true
+      },
+      "self_test_passed": true,
+      "started_at": "2026-07-24T15:04:27.301127Z",
+      "timed_out": false,
+      "workspace_error": null,
+      "workspace_ready": true
+    }
+  }
+}

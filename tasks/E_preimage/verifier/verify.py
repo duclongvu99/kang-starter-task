@@ -42,40 +42,48 @@ MAX_NONCE = 1 << 64
 SOLVE_TIME_LIMIT = 180
 
 _RUNNER = '''\
-import hashlib, importlib.util, json, signal, sys
+import hashlib, importlib, json, os, signal, sys
+# Put this runner's dir on sys.path so the candidate is importable BY NAME as
+# "solve" -- both here and inside any spawn/fork child the candidate may create.
+# (An earlier version loaded it as "solve.py" under the module name "sub", which
+# made multiprocessing spawn children fail with `import of module 'sub'` when the
+# candidate's own solve() used multiprocessing. Importing by the real filename
+# stem fixes that; the __main__ guard keeps spawn children from re-running us.)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 PREFIX = bytes.fromhex({prefix_hex!r})
 TARGET = bytes.fromhex({target_hex!r})
 MAX_NONCE = {max_nonce}
 LIMIT = {limit}
 class _T(Exception): pass
 def _a(s, f): raise _T()
-spec = importlib.util.spec_from_file_location("sub", "solve.py")
-m = importlib.util.module_from_spec(spec)
-out = {{"kind": "error", "value": "unknown"}}
-try:
-    spec.loader.exec_module(m)
-    fn = getattr(m, "solve", None)
-    if not callable(fn):
-        out = {{"kind": "error", "value": "no_solve_callable"}}
-    else:
-        signal.signal(signal.SIGALRM, _a); signal.alarm(LIMIT)
-        try:
-            r = fn(PREFIX, TARGET, MAX_NONCE)
-            if isinstance(r, bool):
-                out = {{"kind": "other", "value": repr(r)}}
-            elif isinstance(r, int):
-                out = {{"kind": "int", "value": str(r)}}
-            elif isinstance(r, str):
-                out = {{"kind": "str", "value": r}}
-            else:
-                out = {{"kind": "other", "value": repr(r)[:80]}}
-        except _T:
-            out = {{"kind": "timeout", "value": None}}
-        finally:
-            signal.alarm(0)
-except Exception as e:
-    out = {{"kind": "error", "value": type(e).__name__ + ":" + str(e)[:80]}}
-print("RESULT:" + json.dumps(out))
+def _main():
+    out = {{"kind": "error", "value": "unknown"}}
+    try:
+        m = importlib.import_module("solve")
+        fn = getattr(m, "solve", None)
+        if not callable(fn):
+            out = {{"kind": "error", "value": "no_solve_callable"}}
+        else:
+            signal.signal(signal.SIGALRM, _a); signal.alarm(LIMIT)
+            try:
+                r = fn(PREFIX, TARGET, MAX_NONCE)
+                if isinstance(r, bool):
+                    out = {{"kind": "other", "value": repr(r)}}
+                elif isinstance(r, int):
+                    out = {{"kind": "int", "value": str(r)}}
+                elif isinstance(r, str):
+                    out = {{"kind": "str", "value": r}}
+                else:
+                    out = {{"kind": "other", "value": repr(r)[:80]}}
+            except _T:
+                out = {{"kind": "timeout", "value": None}}
+            finally:
+                signal.alarm(0)
+    except Exception as e:
+        out = {{"kind": "error", "value": type(e).__name__ + ":" + str(e)[:80]}}
+    print("RESULT:" + json.dumps(out))
+if __name__ == "__main__":
+    _main()
 '''
 
 

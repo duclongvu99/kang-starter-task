@@ -1,0 +1,195 @@
+{
+  "agent_run": {
+    "command": [
+      "/usr/bin/sandbox-exec",
+      "-p",
+      "(version 1)\n(allow default)\n(deny file-read* file-write* (subpath \"/HOME/Documents/Long_VD_Infor/l_application\"))\n(deny file-write* (subpath \"/private/tmp\") (subpath \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T\"))\n(allow file-read-metadata (literal \"/HOME/Documents/Long_VD_Infor/l_application\") (literal \"/REPO\") (literal \"/REPO/.venv\") (literal \"/REPO/results\") (literal \"/REPO/results/runs\") (literal \"/REPO/results/runs/20260724T150421.630439Z-545ef5ed\") (literal \"/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials\") (literal \"/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C\") (literal \"/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C/sol\") (literal \"/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C/sol/trial_5\") (literal \"/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C/sol/trial_5/agent-private\") (literal \"/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C/sol/trial_5/sandbox\"))\n(allow file-read* (literal \"/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C/sol/trial_5/sandbox\"))\n(allow file-read* file-write* (subpath \"/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C/sol/trial_5/sandbox\"))\n(allow file-read* (literal \"/REPO/.venv\"))\n(allow file-read* (subpath \"/REPO/.venv\"))\n(allow file-read* file-write* (literal \"/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C/sol/trial_5/agent-private\"))\n(allow file-read* file-write* (subpath \"/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C/sol/trial_5/agent-private\"))",
+      "codex",
+      "exec",
+      "You are an autonomous coding agent working in the current working directory, which contains a self-contained coding task. Read README.md and SPEC.md first, then complete the task by creating/editing files in this directory. Follow every rule stated in README.md exactly. Verify your own work as best you can. Do not ask questions and do not stop early \u2014 produce the complete deliverable, then finish.",
+      "-C",
+      "/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C/sol/trial_5/sandbox",
+      "-s",
+      "danger-full-access",
+      "--skip-git-repo-check",
+      "-m",
+      "gpt-5.6-sol",
+      "-c",
+      "model_reasoning_effort=\"high\""
+    ],
+    "execution_error": "PermissionError: [Errno 1] Operation not permitted",
+    "finished_at": "2026-07-24T18:47:26.203367Z",
+    "isolation": {
+      "available": true,
+      "backend": "darwin-seatbelt",
+      "capabilities": {
+        "agent_shared_temp_write_isolated": null,
+        "benchmark_secrets_isolated": null,
+        "candidate_isolated": null,
+        "candidate_network_isolated": null,
+        "candidate_private_temp_isolated": null,
+        "candidate_protocol_fd_isolated": null,
+        "candidate_submission_read_only": null,
+        "host_filesystem_isolated": false,
+        "sibling_trials_isolated": null,
+        "trial_write_isolated": false
+      },
+      "error": null,
+      "evidence": {
+        "dynamic_probe": [],
+        "unit_tested": [
+          "candidate_protocol_fd_isolated",
+          "candidate_process_group_cleanup",
+          "candidate_output_bounded"
+        ]
+      },
+      "requested": "strict",
+      "warning": "Benchmark-scoped isolation only: hidden verifier/oracle/reference and sibling trials are isolated, but authenticated agent CLIs retain host home/config access; whole-host filesystem and total write isolation are not claimed."
+    },
+    "log": "/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C/sol/trial_5/agent.log",
+    "log_bytes": 326898,
+    "log_cap_bytes": 67108864,
+    "log_overflow": false,
+    "returncode": null,
+    "seconds": 900.033,
+    "started_at": "2026-07-24T18:32:26.180530Z",
+    "timed_out": true
+  },
+  "record": {
+    "agent": "sol",
+    "agent_completed": false,
+    "artifact_passed_verifier": true,
+    "failure_modes": [],
+    "infra_error": true,
+    "passed": false,
+    "primary_success": false,
+    "returncode": null,
+    "seconds": 900.033,
+    "status_reason": [
+      "agent_timeout",
+      "agent_execution_error"
+    ],
+    "task": "C",
+    "timed_out": true,
+    "trial": 5,
+    "trial_valid": false,
+    "verifier_completed": true
+  },
+  "schema_version": 2,
+  "status": {
+    "agent_completed": false,
+    "artifact_passed_verifier": true,
+    "infra_error": true,
+    "primary_success": false,
+    "status_reason": [
+      "agent_timeout",
+      "agent_execution_error"
+    ],
+    "trial_valid": false,
+    "verifier_completed": true
+  },
+  "verdict": {
+    "checks": {
+      "battery": {
+        "details": {
+          "feasible_trap_conflict": {
+            "achieved": 183,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "feasible_trap_cost": {
+            "achieved": 183,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_0": {
+            "achieved": 390,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_1": {
+            "achieved": 292,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_2": {
+            "achieved": 322,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_3": {
+            "kind": "infeasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_4": {
+            "achieved": 198,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_5": {
+            "achieved": 296,
+            "kind": "feasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_6": {
+            "kind": "infeasible",
+            "mode": null,
+            "passed": true
+          },
+          "fuzz_7": {
+            "kind": "infeasible",
+            "mode": null,
+            "passed": true
+          },
+          "infeasible_capacity_pigeonhole": {
+            "kind": "infeasible",
+            "mode": null,
+            "passed": true
+          },
+          "infeasible_conflict_forced": {
+            "kind": "infeasible",
+            "mode": null,
+            "passed": true
+          }
+        },
+        "num_cases": 12,
+        "num_failed": 0,
+        "passed": true
+      },
+      "load": {
+        "passed": true
+      }
+    },
+    "failure_modes": [],
+    "passed": true,
+    "task": "C_prove_it"
+  },
+  "verifier_run": {
+    "command": [
+      "/REPO/.venv/bin/python",
+      "/REPO/tasks/C_prove_it/verifier/verify.py",
+      "--submission",
+      "/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C/sol/trial_5/sandbox"
+    ],
+    "completed": true,
+    "error": null,
+    "execution_error": null,
+    "finished_at": "2026-07-24T18:47:26.561090Z",
+    "log": "/REPO/results/runs/20260724T150421.630439Z-545ef5ed/trials/C/sol/trial_5/verifier.log",
+    "log_bytes": 1837,
+    "log_cap_bytes": 67108864,
+    "log_overflow": false,
+    "returncode": 0,
+    "seconds": 0.356,
+    "started_at": "2026-07-24T18:47:26.205152Z",
+    "timed_out": false
+  }
+}

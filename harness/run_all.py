@@ -50,6 +50,8 @@ TASK_DIRS = {
     "C": ROOT / "tasks" / "C_prove_it",
     "D": ROOT / "tasks" / "D_invariant",
     "E": ROOT / "tasks" / "E_preimage",
+    "F": ROOT / "tasks" / "F_concurrency",
+    "G": ROOT / "tasks" / "G_timing_safe",
 }
 
 PROMPT = (
@@ -270,6 +272,13 @@ def run_sol(
     log_path: Path,
     isolation_mode: str = "strict",
 ) -> dict[str, Any]:
+    # Under strict isolation our Seatbelt profile (agent_profile) is the sandbox.
+    # codex must NOT also apply its own sandbox-exec: macOS cannot nest
+    # sandbox-exec, and the inner sandbox_apply fails with "Operation not
+    # permitted", leaving the agent unable to touch the filesystem. So we run
+    # codex with its own sandbox disabled and let our outer profile contain it.
+    # In host mode there is no outer profile, so codex keeps workspace-write.
+    codex_sandbox = "danger-full-access" if isolation_mode == "strict" else "workspace-write"
     cmd = [
         "codex",
         "exec",
@@ -277,7 +286,7 @@ def run_sol(
         "-C",
         str(sandbox),
         "-s",
-        "workspace-write",
+        codex_sandbox,
         "--skip-git-repo-check",
         "-m",
         "gpt-5.6-sol",
@@ -321,6 +330,15 @@ AGENT_INFRA_PATTERNS = {
     ),
     "api_unavailable": re.compile(
         r"(?:(?:api|service) (?:is )?(?:unavailable|overloaded)|service unavailable|bad gateway)",
+        re.I,
+    ),
+    # The agent's own sandbox failing to initialize (e.g. codex nesting its
+    # sandbox-exec inside ours) means it could not touch the filesystem at all;
+    # that is an environment failure, not a capability result. Flag it so such a
+    # trial is marked invalid rather than counted as a (spurious) failure.
+    "sandbox_rejected": re.compile(
+        r"(?:sandbox_apply: Operation not permitted|sandbox-exec: .*not permitted|"
+        r"execution (?:environment|sandbox) (?:rejected|is currently rejecting))",
         re.I,
     ),
 }

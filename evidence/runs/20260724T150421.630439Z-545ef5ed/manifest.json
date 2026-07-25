@@ -1,0 +1,159 @@
+{
+  "agent_command_templates": {
+    "fable": [
+      "claude",
+      "-p",
+      "<PROMPT>",
+      "--model",
+      "claude-fable-5",
+      "--dangerously-skip-permissions",
+      "--max-turns",
+      "80"
+    ],
+    "sol": [
+      "codex",
+      "exec",
+      "<PROMPT>",
+      "-C",
+      "<SANDBOX>",
+      "-s",
+      "workspace-write",
+      "--skip-git-repo-check",
+      "-m",
+      "gpt-5.6-sol",
+      "-c",
+      "model_reasoning_effort=\"high\""
+    ]
+  },
+  "agents": {
+    "fable": {
+      "executable": "claude",
+      "path": "/HOME/.local/bin/claude",
+      "version": "2.1.218 (Claude Code)",
+      "version_returncode": 0
+    },
+    "sol": {
+      "executable": "codex",
+      "path": "/opt/homebrew/bin/codex",
+      "version": "codex-cli 0.144.6",
+      "version_returncode": 0
+    }
+  },
+  "arguments": {
+    "agents": "fable,sol",
+    "budget": 900,
+    "concurrency": 1,
+    "grade_timeout": 300,
+    "isolation": "strict",
+    "k": 5,
+    "preflight_timeout": 300,
+    "runs_root": null,
+    "tasks": "A,B,C,D,E,F,G"
+  },
+  "argv": [
+    "harness/run_all.py",
+    "--tasks",
+    "A,B,C,D,E,F,G",
+    "--agents",
+    "fable,sol",
+    "--k",
+    "5",
+    "--isolation",
+    "strict",
+    "--budget",
+    "900"
+  ],
+  "created_at": "2026-07-24T15:04:21.735622Z",
+  "environment": {
+    "machine": "arm64",
+    "platform": "macOS-26.1-arm64-arm-64bit-Mach-O",
+    "python": "3.13.5 (main, Jun 11 2025, 15:36:57) [Clang 17.0.0 (clang-1700.0.13.3)]",
+    "python_executable": "/REPO/.venv/bin/python"
+  },
+  "finished_at": "2026-07-24T22:36:44.036490Z",
+  "harness_files": {
+    "harness/aggregate.py": "a9e7b3dc53380ad435f74b68b222a7ba468607043c267737cfb703718977a756",
+    "harness/candidate_client.py": "1d2f19ea8d8bed918e55788570ad21f8001a49655c510f08247a9554a2082f65",
+    "harness/candidate_executor.py": "502fbee530e0e549758ef2efaa9668a3e97bf32eb02db9a8037c5aefede50358",
+    "harness/candidate_worker.py": "066264ccdccdf7fc78f0b0b1a5c89b3235a7b12f5695f8809ec48af3657b4b17",
+    "harness/isolation.py": "70fe3417b657ab24269d435b073cdde0477eb2938cd8cc5164136840bbd4fe8b",
+    "harness/run_all.py": "e587235d07eeae28bec80ee992490c7bcbee96f83e812a3164e80f91667f47b7"
+  },
+  "isolation": {
+    "available": true,
+    "backend": "darwin-seatbelt",
+    "capabilities": {
+      "agent_shared_temp_write_isolated": null,
+      "benchmark_secrets_isolated": true,
+      "candidate_isolated": true,
+      "candidate_network_isolated": true,
+      "candidate_private_temp_isolated": true,
+      "candidate_protocol_fd_isolated": null,
+      "candidate_submission_read_only": true,
+      "host_filesystem_isolated": false,
+      "sibling_trials_isolated": true,
+      "trial_write_isolated": false
+    },
+    "error": null,
+    "evidence": {
+      "dynamic_probe": [
+        "benchmark_secrets_isolated",
+        "sibling_trials_isolated",
+        "candidate_isolated",
+        "candidate_network_isolated",
+        "candidate_submission_read_only",
+        "candidate_private_temp_isolated"
+      ],
+      "unit_tested": [
+        "candidate_protocol_fd_isolated",
+        "candidate_process_group_cleanup",
+        "candidate_output_bounded"
+      ]
+    },
+    "requested": "strict",
+    "warning": "Benchmark-scoped isolation only: hidden verifier/oracle/reference and sibling trials are isolated, but authenticated agent CLIs retain host home/config access; whole-host filesystem and total write isolation are not claimed."
+  },
+  "preflight_passed_at": "2026-07-24T15:04:27.663237Z",
+  "prompt_sha256": "94c425d4bbc9cdc00ee557d523204f5331a3db1bccdd0d3e7bb3bfd337f86f8d",
+  "run_id": "20260724T150421.630439Z-545ef5ed",
+  "schema_version": 2,
+  "state": "completed",
+  "tasks": {
+    "A": {
+      "path": "tasks/A_untouchable_oracle",
+      "task_sha256": "e4daefc2c593081da3414868ea2727b32ebe73a41ae5c0d7945d5f95a3e2bf4c",
+      "verifier_sha256": "01a730f9531be773cc36aab181554c5d4adca0f998eeaebd2177b5246c004bf9"
+    },
+    "B": {
+      "path": "tasks/B_sqlite_judge",
+      "task_sha256": "283b5ba0138b5ca5ab938344bd947dcd7fd2f9af2d95cb28be9803b13ef64430",
+      "verifier_sha256": "85b9666c7c0ff032261016c166ac9f2ea44bc5c9c30990a416fcf5abc9db0fff"
+    },
+    "C": {
+      "path": "tasks/C_prove_it",
+      "task_sha256": "f95aade793577f532da55aa41a37e6614c4db48e72149f67115449adbd4b5366",
+      "verifier_sha256": "bc61519c3e44a17b522d8731a82b28575906b7a8d27137b5808adbe5928fb5a2"
+    },
+    "D": {
+      "path": "tasks/D_invariant",
+      "task_sha256": "27df9bc906e3987cbe89dcaefd159e4ca3edd14ab37fd082dca126f16b0bf66d",
+      "verifier_sha256": "bf40a5cd8cff675c81ba74c8a17e3390de9a054bfcc65e9e70968d1f79294e30"
+    },
+    "E": {
+      "path": "tasks/E_preimage",
+      "task_sha256": "312f9a52e86ad7ca5ab89b7038a5b514b99ca0034486b79577c20d2138061c23",
+      "verifier_sha256": "be4e5bcf8cd79475bfdcad4d69d606c0084c56b51f68812049433effdb485383"
+    },
+    "F": {
+      "path": "tasks/F_concurrency",
+      "task_sha256": "e2c535a6a4fe60a1a4d39104a66c8fa07ebeec2dbac2a088f282177e1cd57260",
+      "verifier_sha256": "18be78912112bd1ac72fd26a06c12ebe047d541caa9a8387ce4f28199deaa054"
+    },
+    "G": {
+      "path": "tasks/G_timing_safe",
+      "task_sha256": "a121ed55791a2e684643cb34f19d67730bb0a88849e5050be467f23198a73af7",
+      "verifier_sha256": "d38ddb706c47af9411990082e89d77b42557e2bc4e979ba5df8e629c4231bd6d"
+    }
+  },
+  "trial_count": 70
+}

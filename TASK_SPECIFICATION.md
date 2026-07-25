@@ -13,9 +13,10 @@ nothing. The hard part is making **"cannot do it"** a claim that survives the sa
 scrutiny your ABC work applies to existing benchmarks: a claim that is *fair*,
 *mechanically decided*, *resampled*, *reproducible*, and *scoped*.
 
-So this document specifies the **admissibility protocol** first, and treats the three
-tasks as instances of it. A task is admitted to the suite only if it passes every gate
-below. The organizing idea is one distinction:
+So this document specifies the **admissibility protocol** first, and treats the tasks as
+instances of it. A task is admitted to the suite only if it passes every gate below. Seven were
+built: five in the first pass (A–E), and two more (F, G) added after an audit, once it was clear
+that the first pass had found no fair capability gap. The organizing idea is one distinction:
 
 > **Shape vs. substance.** Every task exposes the agent to a *weak, visible* signal
 > (example tests it can run and iterate against) and is decided by a *strong, hidden,
@@ -63,10 +64,37 @@ can check construct validity rather than a correlated proxy (e.g. tool-syntax fl
   leaking the witness — so E is a **declared exception**: a pilot probe of the
   search/verification asymmetry, not a fully-admitted task, and a budget-relative
   difficulty rather than a capability gap.
+- **F — concurrency correctness (capability, i; added after an audit):** implement a transfer
+  transaction that is correct under *every* interleaving. Decided by an exhaustive
+  interleaving model checker plus a concurrent auditor, so the only passing pattern is
+  two-phase locking with a global lock order. Added specifically because "A–D failed to
+  discriminate" is a weak basis for a claim about category (i): F targets a documented weak
+  area, and its visible tests deliberately cannot reveal a race, so an agent cannot iterate
+  its way to correctness.
+- **G — timing-safe comparison (capability, i; added after an audit):** implement token
+  equality that leaks nothing but length. Decided **deterministically** — executed-opcode
+  invariance across equal-length inputs that differ at different positions, plus an AST check
+  for direct `param == param` — because a wall-clock timing measurement would be noisy and
+  therefore an unfair grader. Added as a second gap hunt, in a security-relevant area where
+  "looks right" and "is right" come apart.
 
-The empirical result (see `REPORT.md`): for Fable and GPT-5.6 Sol, category (i) is nearly
-empty in the fair, fully-specified regime — A–D were all solved — so E is the task that
-reliably holds. That finding, not a contrived "unbeatable" task, is the contribution.
+The empirical result (see `REPORT.md`), from one 70-trial run: for Fable and GPT-5.6 Sol,
+category (i) is **empty across all six category-(i) tasks** — A, B, D, F and G were solved
+cleanly by both agents, and C is solved by both on the artifact but usually exceeds the 900 s
+budget (a speed limit, not a capability gap) — so E, the declared category-(ii) exception, is
+the only task that holds. That finding, not a contrived "unbeatable" task, is the contribution.
+Task F also rules out the obvious deflationary explanation: it is not merely that these agents
+can reconstruct a checker and iterate against it, because in F they cannot, and they still
+succeeded. Task G is a weaker instance of the same result: the canonical answer is one stdlib
+call, so its negative result carries correspondingly less weight, and I say so rather than
+counting seven tasks as seven pieces of evidence.
+
+An accident in that run reinforced the same conclusion from the opposite direction: the harness's
+sandbox profile disabled one agent's shell in 22 of its 35 trials, so it could not execute the
+visible tests, a solver, or any code at all — and it still produced verifier-passing artifacts in
+every one of those trials. That is the strongest available evidence that success on these tasks is
+reasoning from the specification rather than iteration against a signal. It is also a validity
+failure of this protocol, which is why gate **G12(e)** now exists.
 
 ---
 
@@ -125,6 +153,30 @@ clock / reasoning effort), on models M, on date D.* It is a snapshot of a capabi
 frontier, not a permanent ceiling — frontier models move, and the claim is stated to
 move with them.
 
+**G12 — Trial-validity classification is itself evidence, and must be audited.** Deciding
+which trials *count* is as consequential as grading them, and it fails in both directions: an
+environment failure scored as incapability makes a model look worse, and an over-eager
+"infrastructure" verdict silently discards valid trials, which makes a benchmark kinder to the
+models it measures. So: (a) every voided trial records a machine-readable reason; (b) the reason
+must be derived from the *harness's own* observations (exit status, timeout, sandbox
+initialisation), never from keyword-matching the agent's output, which the agent controls;
+(c) one underlying event must not receive two different verdicts depending on a race;
+(d) the voided trials are enumerated in the report, not summarised as a count; and
+
+**(e) each agent's own tooling must be verified live, inside the real sandbox, before any trial
+is scored.** Before the first graded trial, each agent is asked to execute a trivial command and
+report the result; a trial in which the agent's shell, file access, or interpreter is unavailable
+is an environment failure regardless of its outcome — *including when that outcome is a pass.*
+This clause exists because it is the defect that actually happened, and it is the one a benchmark
+author is structurally least likely to catch: the harness's sandbox profile silently disabled one
+agent's shell in most of its trials, and because those trials still *passed*, nothing in the
+pipeline objected. A validity check that only fires on failures is not a validity check.
+
+The run reported in `REPORT.md` violates (b), (c) and (e) — see "Three defects in my own harness"
+there. The numbers reported are the conservative ones the defective classifier produced; no
+verdict was retroactively edited, and the affected readings are marked uninterpretable rather
+than corrected by hand.
+
 ---
 
 ## 3. Evaluation protocol
@@ -136,7 +188,11 @@ For each (task, agent, trial):
 2. The agent is run **in that sandbox with an identical prompt and identical budget**
    across agents: read the README/SPEC, complete the task, follow all rules.
    - Fable: `claude -p … --model claude-fable-5` (Claude Code, headless).
-   - GPT-5.6 Sol: `codex exec … -m gpt-5.6-sol` (Codex, workspace-write sandbox).
+   - GPT-5.6 Sol: `codex exec … -m gpt-5.6-sol` (Codex). Under strict isolation codex runs
+     with `-s danger-full-access` and the harness's own macOS Seatbelt profile is the
+     sandbox: macOS cannot nest `sandbox-exec`, so codex applying its own sandbox inside
+     ours leaves it unable to touch the filesystem at all. In host mode codex keeps
+     `workspace-write`. The command actually executed is recorded per trial.
 3. The resulting sandbox is graded by the task's hidden verifier
    (`verify.py --submission <sandbox>`), which emits a verdict + failure modes.
 4. pass@k and the failure-mode distribution are aggregated per (task, agent).
@@ -148,9 +204,14 @@ lets the comparison be about the models, not the harness.
 
 ## 4. Honest limitations (stated, not hidden)
 
-- With 3 tasks and k ≈ 5, this is a **demonstration of a protocol**, not a
+- With 7 tasks and k = 5 (70 trials), this is a **demonstration of a protocol**, not a
   statistically-powered benchmark; it makes no discrimination/power claim its sample
-  size cannot support.
+  size cannot support. Its strongest claim is a negative one about the tasks it contains.
+- **Not every task carries equal weight, and the protocol should say which.** A task whose
+  canonical solution is one stdlib call (G) is weak evidence about a capability even when it is
+  perfectly graded; a task where the visible signal cannot reveal the deciding property (F) is
+  strong evidence. Task count is not evidence count, and a suite that reports only pass rates
+  hides the difference.
 - "Cannot do" is **budget-relative**: a larger turn/token budget, or a different
   scaffold, may pass any of these. The budget is fixed and disclosed; the claim is
   scoped to it.
