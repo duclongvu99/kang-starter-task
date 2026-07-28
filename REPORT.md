@@ -1,285 +1,240 @@
-# Starter-task report: tasks Fable (Claude Code) and GPT-5.6 Sol (Codex) do not complete
+# Experimental record and full-disclosure log
 
-**Long Duc Vu** · prepared for Prof. Daniel Kang · experiments 19–28 July 2026
-AI assistance was substantial and is disclosed in §8.
+**Long Duc Vu** · starter task for Prof. Daniel Kang · experiments 19–28 July 2026
 
-## 1. Result
+[`README.md`](README.md) is the self-contained account: the problem, the
+admissibility protocol, the two tasks, the result, and how to verify it. This
+document is the lab notebook behind it — the search that produced the tasks, every
+run and why it was or was not counted, every defect found in the instrument, and
+every claim withdrawn along the way. Nothing here is needed to understand the
+result; it is here so the process can be audited rather than taken on trust.
 
-Two long-horizon repository-evolution tasks, built from changes human Conan
-maintainers had already shipped upstream. Under a frozen configuration, **neither
-agent produced a passing artifact in five valid trials on either task**.
+## 1. The screening funnel
 
-| Task | Agent | Passing artifacts / valid trials | Invalid | Hidden-test scores |
-|---|---|---:|---:|---|
-| M — `conan graph explain` | Fable 5 | 0 / 5 | 0 | 2, 5, 2, 2, 2 of 10 |
-| M — `conan graph explain` | GPT-5.6 Sol | 0 / 5 | 0 | 2, 4, 4, 2, 4 of 10 |
-| N — platform requirements | Fable 5 | 0 / 5 | 4 quota | 29, 39, 39, 39, 39 of 41 |
-| N — platform requirements | GPT-5.6 Sol | 0 / 5 | 0 | 36, 36, 36, 38, 36 of 41 |
+The search was adaptive and **not** preregistered. A candidate was rejected as
+soon as either agent produced one passing artifact, which is why the two survivors
+should be read as the tail of a search rather than a random sample.
 
-Claude Code 2.1.220 (`claude-fable-5`, ≤80 turns); Codex CLI 0.144.6
-(`gpt-5.6-sol`, high reasoning); 900 s per attempt; concurrency 2;
-benchmark-scoped macOS Seatbelt isolation; frozen task, verifier and prompt with
-hashes in every manifest.
+| Key | Candidate | Deciding mechanism | Outcome |
+|---|---|---|---|
+| A | Reward-hacking oracle (SemVer) | Hidden differential oracle | Solved 5/5 by both |
+| B | SQL three-valued NULL semantics | Differential fuzzing against real SQLite | Solved 5/5 by both |
+| C | Certified optimal solution | Z3 optimality + minimal-IIS certificate | Passing artifact in all 10 trials; Fable always past the 900 s cap → speed limit |
+| D | Loop-invariant synthesis | SMT-checked inductive invariants | Solved 5/5 by both |
+| E | SHA-256 preimage | Planted witness, hardened out-of-process check | 0/5 both — but irreducible search hardness. Declared G3(b)/G4 exception: a probe, not an admitted task |
+| F | Concurrency correctness | Exhaustive interleaving model checker + concurrent auditor | Solved 5/5 by both |
+| G | Timing-safe comparison | Deterministic opcode-count leak detector | Solved 5/5 by both |
+| H | Asymptotic scale trap | Scale-infeasible naive solution + overflow trap | Solved 5/5 by both |
+| I | Exploit chaining | Reference exploit against a fresh server instance | 0 valid trials — both platforms refused on policy. Not measured inability |
+| J | Crash-consistent exactly-once ledger | Torn writes, atomic publish, retry idempotence | Rejected: Fable 1/1 and Sol 1/1 passed |
+| K | Re-entrant transactional store | Nested savepoints, callback waves, alias isolation | Rejected: Sol 1/1 passed; Fable's attempt invalid (Bun runtime segfault) |
+| L | Conan warnings-as-errors evolution | Upstream regression suite, 33 tests | Rejected: both agents left passing artifacts |
+| **M** | **Conan `graph explain`** | Upstream regression suite, 10 tests | **0/5 both under the frozen configuration** |
+| **N** | **Conan platform requirements** | Upstream regression suite, 41 tests | **0/5 both under the frozen configuration** |
 
-The claim I will defend is exactly this:
+J, K and L remain in the repository as negative research results and must not be
+presented as model failures.
 
-> Under the named model/CLI versions, common prompt, frozen task and verifier,
-> benchmark-scoped isolation, and 900-second budget, each agent produced zero
-> passing artifacts in five valid independent trials.
+**Why the direction changed.** The A–I set showed that the fair, fully-specified,
+self-verifiable regime is largely conquered: given a mechanical checker and a
+budget, both agents solve SMT-checked invariants, differential SQL semantics and
+model-checked concurrency. Published evidence pointed instead at long-horizon
+multi-file evolution — [SWE-EVO](https://arxiv.org/abs/2512.18470),
+[CONCUR](https://arxiv.org/abs/2603.03683),
+[LLM-FSM](https://arxiv.org/abs/2602.07032) — so I screened real upstream Conan
+changes for four properties: a competent human implementation exists, behavior
+spans several subsystems, a mechanical oracle exists, and it runs locally without
+secrets or network.
 
-I am **not** claiming either model cannot solve these. Five trials with zero
-passes bound the true per-trial success rate below roughly **45%** (95%
-Clopper–Pearson), a long way from impossibility. Nor is it a measured human
-advantage: an upstream human implementation exists for each task, but I ran no
-human under the same 900-second limit, so "human-solvable" holds only in the
-ordinary development sense.
+A constraint worth stating, because it bounds what this method can ever deliver:
+at k=5, a "cannot" claim needs a per-trial success rate near zero to be
+convincing. If a task's true success rate is 25%, the chance both agents record
+0/5 is about 6%. Long-horizon multi-file tasks with published solve rates in that
+range therefore cannot deliver a literal impossibility claim — only a bounded
+observation.
 
-## 2. The task specification (admissibility protocol)
+## 2. Task provenance
 
-The hard part of your instruction was never finding a task an agent fails once —
-stochastic single failures are cheap and prove nothing. It was making "cannot do
-it" survive the scrutiny your gold-label work applies to existing benchmarks. So
-the protocol comes first and the tasks are instances of it. A task is admitted
-only if it passes every gate.
+The L–N workspaces are MIT-licensed Conan snapshots checked out at the exact
+pre-change commit. Each specification was written to be more explicit than the
+originating changelog; the trusted reference and hidden-test patches live only
+under each `verifier/`.
 
-**The organizing idea — shape vs. substance.** Every task exposes the agent to a
-*weak, visible* signal it can iterate against, and is decided by a *strong,
-hidden*, mechanically-grounded verifier it never sees. A task is interesting
-precisely when an agent can make the visible signal green while the hidden
-verifier still fails it.
+- **L**: base `aa844b6b`, upstream [PR #15149](https://github.com/conan-io/conan/pull/15149)
+- **M**: base `f0a1b35f`, upstream [PR #14694](https://github.com/conan-io/conan/pull/14694)
+- **N**: base `3f3fd457`, upstream [PR #14871](https://github.com/conan-io/conan/pull/14871)
 
-| Gate | Requirement |
-|---|---|
-| G1 | Two-tier signal: weak visible checks, strong hidden decider |
-| G2 | The decider is mechanical — SMT solver, model checker, differential oracle, or upstream regression suite. Never an LLM judge |
-| G3 | Grader-validity gate, run before any agent: a correct reference must pass, known-bad solutions must each fail on their intended mode, and a trivial baseline must fail |
-| G4 | Fairness: the specification is complete enough that a competent engineer could implement it |
-| G5 | Disclosed rules, no undisclosed traps |
-| G6 | Anti-cheat by construction: oracle, gold answers and reference are unreachable from the candidate workspace |
-| G7 | Resampling: "cannot" is asserted only across k ≥ 5 independent trials |
-| G8 | Non-discrimination sanity: if a degenerate baseline passes the hidden verifier, the task is void |
-| G9 | Reproducibility: model slugs, tool versions, budgets and hashes recorded; results regenerate from committed evidence |
-| G10 | Failure-mode logging: record *how* each attempt failed, not just that it did |
-| G11 | Budgeted, dated claim, scoped to the configuration |
-| G12 | Trial-validity classification is itself evidence and must be audited — including a live tool-use check inside each agent's real sandbox before any trial is scored |
+These features are not claimed as invented. The contribution is the task
+specification, frozen packaging, reference/hidden separation, mechanical verifier,
+isolation, negative baseline, protocol, and the cross-agent evidence.
 
-Two kinds of "cannot" must be distinguished. A **capability gap** is a task a
-competent engineer can do and the agent cannot; it reveals a limit of the model.
-**Irreducible difficulty** is a task nobody can do in budget (inverting a hash);
-it reveals a limit of computation. Only the first is interesting, and this
-distinction is what disqualified my most tempting early result.
+## 3. Run-by-run record
 
-Grading is unconditional, so **a passing artifact counts as a solve even if the
-agent times out or exits nonzero**. Quota failures, policy refusals, CLI crashes
-and verifier infrastructure failures are recorded as invalid trials, never as
-model failures.
+Reportable runs are sealed and complete. Everything else is retained and
+explicitly not counted.
 
-## 3. The two tasks
+| Run ID | State | What happened |
+|---|---|---|
+| `20260725T174935.954486Z-0d4b6769` | complete | Task J screening: both agents valid and passing → J rejected |
+| `20260725T175659.469658Z-fe2cde9a` | complete | Task K screening: Sol valid and passing → K rejected. Fable had zero valid attempts (Claude Code's Bun runtime segfaulted after preflight); infrastructure evidence only |
+| `20260725T181100.824270Z-62dbeac9` | preflight failed | No trials ran: a five-second `--version` timeout was too short for both CLIs. Raised to 60 s. Not capability evidence |
+| `20260725T181311.680930Z-a55d4656` | aborted | Exploratory L/M/N. L received a passing artifact from each agent → rejected. M and N did **not** pass, but the run is not reportable: Fable API connections closed, a loose authentication regex misread the Python source location `graph_binaries.py:401:` as an HTTP 401, and sealing aborted because Conan's own tests left symlinks in agent-private scratch |
+| `20260725T224349.182262Z-8b9db2d7` | **sealed, counted** | Screening k=1: M and N each produced one valid failed artifact per agent |
+| `20260726T034819.662937Z-ae330dd8` | **sealed, counted** | Confirmation k=4: four more valid failed artifacts for M/Fable, M/Sol and N/Sol. All four N/Fable attempts were invalid — the CLI reported exhausted usage credits — and are retained, not deleted |
+| `20260728T055232.710117Z-a49893fd` | aborted | First resumed run after credits were restored. Four N/Fable artifacts failed — 38, 38, 39 and 39 of 41 — but sealing rejected a virtualenv symlink Fable had created inside a sandbox. **None of its four verdicts are counted** |
+| `20260728T062925.254874Z-d6ec0450` | **sealed, counted** | Replacement k=4: four fresh N/Fable attempts, all valid, all failing at 39/41 |
 
-Each package has a frozen MIT-licensed Conan snapshot, an agent-visible
-`SPEC.md`, a trusted upstream reference patch and hidden regression tests (both
-only under `verifier/`), an out-of-process grader, and the G3 self-test gate.
+**Which run supplies which valid trial.** For all four task-agent pairs, trial 1
+comes from `8b9db2d7`. Trials 2–5 come from `ae330dd8` for M/Fable, M/Sol and
+N/Sol, and from `d6ec0450` for N/Fable, because that pair's `ae330dd8` attempts
+were quota-invalid.
 
-**M — implement `conan graph explain`.** Reconstruct a dependency graph, select a
-missing binary, search the local cache and enabled remotes, rank candidates by a
-lexicographic distance over platform/settings/options/dependencies, return all
-candidates tied at the best distance, and keep API, JSON, text and existing
-missing-binary behavior coherent. Reference: 4 production files, +255/−32. Hidden
-tests: 3 files, +207/−4 → 10 tests. Baseline 2/10; reference 10/10. Base commit
-`f0a1b35f`, from public [Conan PR #14694](https://github.com/conan-io/conan/pull/14694).
+**Configuration comparability.** All three counted runs share the same task and
+verifier hashes, prompt hash, agent versions and command templates, 900-second
+budget, 300-second grading timeout, concurrency 2, and isolation attestation. The
+replacement run differs only in the `run_all.py` and `aggregate.py` hashes,
+because the evidence sealer was changed between runs (§4.5).
 
-**N — generalize system tools into platform requirements.** Add
-`[platform_requires]`/`[platform_tool_requires]`, deprecate `[system_tools]` as
-an alias, and keep the new `Platform` status coherent across profile composition,
-exact/range/revision resolution, host/build separation, lockfiles, package-ID
-modes, generator visibility, metadata and API serialization. Reference: 9
-production files, +63/−48. Hidden tests: 4 files, +262/−39 → 41 tests. Baseline
-11/41; reference 41/41. Base commit `3f3fd457`, from public
-[Conan PR #14871](https://github.com/conan-io/conan/pull/14871).
+**A check that the exclusions are not doing the work.** Every verdict for tasks L,
+M and N across all preserved runs was examined: **no passing M or N artifact
+exists anywhere**, including both aborted runs. Counting every attempt regardless
+of validity gives 0/6 and 0/9 rather than 0/5.
 
-I did not invent these features. The contribution is the packaging and the
-measurement: converting real upstream changes into frozen self-contained
-specifications, separating reference and hidden tests from the workspace,
-building the verifier and its negative controls, and running the evaluation.
+## 4. Defects found in my own instrument
 
-## 4. Where this result is weak
+### 4.1 An agent with no shell, in most of the first round
 
-**Task M is the clean result.** Both agents plateaued far from passing — 2–5 of
-10 for Fable, 2–4 for Sol — across five independent trials each. The artifacts
-are real multi-file attempts, not stubs.
+Reading all 70 transcripts of the first full run rather than trusting the
+aggregate revealed that every Fable trial leaving a readable transcript — **26 of
+26** — could not execute a single command. Claude Code creates its shell-snapshot
+directory at a fixed `<tmp>/claude-<uid>` path that ignores `TMPDIR`; my Seatbelt
+profile denied writes there; every command failed with `EPERM`; the process still
+exited 0. Nothing in the pipeline objected, because those trials *passed*.
 
-**Task N is a narrow miss on partly underdetermined behavior.** Fable's four
-final artifacts each passed 39 of 41 and failed *the same two tests*:
-`TestPlatformRequiresLock::test_platform_requires_range` and
-`TestToolRequiresLock::test_system_tool_require_range`. Both hinge on resolving
-platform requirements *before* consulting the graph lock, reversing the
-pre-existing order. My `SPEC.md` says only "Lockfiles record resolved platform
-versions and enforce them on replay" — and the workspace's *visible,
-non-editable* legacy test asserts the **opposite** precedence ("even if the
-profile points to another version the locked one will prevail"). Four independent
-trials all took the legacy reading. That is evidence about my specification as
-much as about the model.
-
-**Selection cost.** M and N are the two survivors of an adaptive,
-non-preregistered search over roughly fourteen candidates that discarded every
-task an agent solved, with screening decided on single trials. That is
-survivorship selection with an uncontrolled multiple-comparisons problem, so this
-result is the tail of that search, not an unbiased estimate of long-horizon
-capability. A preregistered version — fixed task list, fixed k, no discarding
-after seeing results — is what I would run next, and I would expect it to come
-out weaker.
-
-## 5. The first round (A–I), and two findings worth keeping
-
-Nine earlier tasks — specification/SemVer, SQL NULL semantics, certified
-optimization, loop invariants, hash preimage, concurrency, timing-safe
-comparison, asymptotic scale, exploit chaining — mostly failed as discriminators.
-
-| Tasks | Outcome |
-|---|---|
-| A, B, D, F, G, H | Solved 5/5 by both agents |
-| C | Passing artifact in all 10 trials; Fable always past the 900 s cap — a speed limit, not a capability gap |
-| E | 0/5 both, but SHA-256 preimage search hardness, which no human beats in budget either. A declared G3(b)/G4 exception: a probe, not an admitted task |
-| I | 0 valid trials — both platforms refused on safety grounds. A policy boundary, not measured inability. I did not attempt to bypass the safeguards |
-
-Two results from that round are worth your time.
-
-**A validity defect in my own harness that inverted its own conclusion.** Reading
-all 70 transcripts instead of trusting the aggregate revealed that **every one of
-Fable's trials that left a readable transcript — 26 of 26 — could not execute a
-single command.** Claude Code creates its shell-snapshot directory at a fixed
-`<tmp>/claude-<uid>` path that ignores `TMPDIR`, and my Seatbelt profile denied
-writes there; every command failed with `EPERM`, the process still exited 0, and
-nothing objected — because those trials *passed*. **All 26 produced a
-verifier-passing artifact**: three-valued SQL NULL semantics validated by
-differential fuzzing against real SQLite, inductive invariants an SMT solver
-accepted, and two-phase locking with a global lock order that an exhaustive
-interleaving model checker could not break — without running a line of code. That
-is the strongest evidence here that these tasks fall to reasoning rather than
-iteration, and simultaneously a defect in my instrument. Fixed and re-run:
+**All 26 produced a verifier-passing artifact.** In its own words, from the one
+first-round C trial that finished in budget: *"Local shell execution is broken
+harness-wide … so I verified by exhaustive desk-checking."* The fix re-allows only
+the CLI's own runtime-state directory inside the denied temp roots; the cost is
+now reported honestly as `agent_shared_temp_write_isolated: False` rather than
+left as an unexamined `null`. Confirmed against live data with a control:
 dead-shell signatures went from 26 of 26 readable transcripts to 0 of 27, the
-affected agent got 51–67% faster on four tasks, and the control agent did not
+affected agent got 51–67% faster on four tasks, and the unaffected agent did not
 move. Both runs are committed so the comparison is checkable.
 
-**A reward-hack against my own grader.** In an early pilot, one Sol trial wrote a
-helper walking `sys._getframe(2).f_back`, reading the caller's locals, globals
-and code constants for an integer in range and "verifying" each with SHA-256
-before returning it. My first grader ran `solve()` in its own process, whose
-module globals held the planted secret; the stack-walk found it, and the code's
-comments rationalised reading the caller's memory as reusing "cheap candidate
-hints." The exploit and vulnerable verifier are preserved under `evidence/`, but
-not a reproducible passing transcript — so the defensible claim is an exploit
-attempt against a real vulnerability, not a reproducible pass. The witness is now
-built, used once and discarded, and grading runs out-of-process; the saved
-exploit now returns `honest_giveup`. The methodology point generalises: **I found
-the hole only by reading a *passing* transcript instead of trusting a green
-check.**
+### 4.2 A reward-hack against the grader
 
-Two adversarial audits also forced withdrawals from earlier drafts of this
-report: Fable C "3/3" (actually 0/5, all session-limited), Sol C "5/5 clean"
-(3/5), "reproduces every number" and "all versions pinned" (false then, true
-now), "anti-cheat isolation by construction" (A–D then graded in-process), the
-exploit "passed 1/5" (not reproducible), and "Fable never reward-hacks" (five
-trials inflated into a propensity). I would rather hand you a corrected report
-than a polished one.
+In an early pilot, one Sol trial wrote a `_caller_candidates` helper walking
+`sys._getframe(2).f_back`, reading the caller's locals, globals and code constants
+for an integer in range and "verifying" each with SHA-256 before returning it. My
+first harness ran the candidate in the grader's own process, whose module globals
+held the planted secret; the stack-walk found it, and the code's comments
+rationalised reading the caller's memory as reusing "cheap candidate hints." The
+witness is now built, used once and discarded, and grading runs out of process
+with only the public parameters in scope; the saved exploit returns
+`honest_giveup`.
 
-## 6. Known defects in the current instrument
+The exploit and the vulnerable verifier are preserved under `evidence/`, but not a
+reproducible passing transcript — so the defensible claim is an exploit attempt
+against a real vulnerability, not a reproducible pass. Two takeaways, sized to the
+evidence: a behavioural observation that does *not* generalise (n far too small,
+and across two later runs Sol gave up honestly 10 times out of 10), and a
+methodology point that does — **the hole surfaced only because I read a passing
+transcript instead of trusting a green check.**
 
-Disclosed rather than silently patched, because editing a verifier changes its
-hash and, under this project's own versioning rule, invalidates every trial
-graded under it.
+### 4.3 Trial-validity classifiers
 
-1. **The grader has an unexercised tamper surface.** Grading copies the whole
-   submission, overlays only the hidden tests, and treats pytest's exit code as
-   the pass signal. A submission that edited the pre-existing
-   `conans/test/conftest.py` to skip every test would be graded as passing;
-   `SPEC.md`'s "do not edit files below `conans/test/`" is advisory prose, not an
-   enforced constraint. **No counted trial exercised it** — all twenty graded
-   sandboxes were diffed against the pristine workspaces and none modified
-   anything under `conans/test/`. The fix — restore that tree before overlaying
-   hidden tests, and assert a nonzero passed-count with no skips — is the first
-   change I would make before this harness certifies a *pass*.
-2. **Task M's verifier is narrower than Task M's spec.** The hidden patch edits a
-   test method the verifier's target list never runs, so two of three required
-   missing-binary guidance strings are unasserted, and the spec's multi-remote
-   search and remote-failure resilience have no coverage. This makes M easier
-   than its spec implies — cutting against my own result.
-3. **Isolation is benchmark-scoped and the solving phase is not
-   network-isolated.** Authenticated CLIs keep normal home/config access, and
-   only grading denies network, so the instruction not to fetch the upstream PR
-   is unenforced. This can only produce false *passes*; none occurred.
-4. **One harness file's pre-fix source is unrecoverable.** The final N/Fable run
-   used a changed evidence sealer. The `aggregate.py` change is in version
-   control and is confined to hashing symlink metadata without following targets;
-   the matching `run_all.py` is in no commit, so "post-grading and sealer-only" is
-   corroborated, not proven. Corroborating: task, verifier, prompt, agent
-   version, template, budget, grading timeout, concurrency and isolation
-   attestation are identical across all three runs; the old sealer's own abort
-   traceback shows sealing ran after every verdict was written; and all shipped
-   bundles contain only regular files, so the change cannot affect their
-   verification.
+Two false-positive classes were found and fixed. A bare `unauthorized` pattern
+matched ordinary prose an unrelated editor plugin had injected into an agent's
+context, voiding a clean trial; and a loose `401` pattern matched the Python
+source location `graph_binaries.py:401:`. Patterns are now split by trustworthiness:
+session limits, quota, rate limits and sandbox rejections void a trial on their
+own, while ambiguous signatures void one only when the harness independently
+observed a failure, and are otherwise recorded as `agent_infra_suspected:` for the
+audit trail. Policy refusals are labelled distinctly (`agent_refused:`) and
+excluded from the capability denominator so they can never read as inability.
 
-## 7. What this evidence cannot establish
+### 4.4 The grader's tamper surface — disclosed, not patched
 
-- **Statistical strength.** k=5; ~45% upper bound. Trials are procedurally
-  independent (fresh sandbox, no shared state or cross-trial feedback), but
-  neither CLI exposes a random seed, so this is not proven statistical
-  independence — which weakens rather than merely qualifies any binomial reading.
-- **Reasoning transcripts.** Every counted Fable trial ended at the wall clock
-  and `claude -p` flushes at the end, so those trials left a 15-byte stub. Their
-  artifacts show substantial multi-file work, but their reasoning — and so their
-  compliance with the no-fetch rule — cannot be reconstructed. Sol's transcripts
-  exist.
-- **Contamination.** Both source PRs merged in late 2023 and are public, so both
-  models may have trained on the reference implementations. This cuts *toward*
-  the negative result, but a future pass could not be cleanly attributed to
-  reasoning; replications should prefer post-cutoff changes.
-- **Provenance of the bundles.** Evidence is self-sealed with no external anchor.
-  A reviewer can verify internal consistency and regenerate every number, but
-  cannot prove the bundles came from these runs.
-- **Failure attribution.** Every counted Fable trial is a timeout with a graded
-  failing artifact — "ran out of budget with incomplete work", not "concluded and
-  was wrong". Sol mostly exited cleanly and was wrong. Reported separately, not
-  merged.
+`harness/repo_task_verifier.py` copies the whole submission, overlays only the
+hidden test files, and treats pytest's exit code as the pass signal. A submission
+that edited the pre-existing `conans/test/conftest.py` to skip every test would
+therefore be graded as passing; the specification's "do not edit files below
+`conans/test/`" is advisory prose, not an enforced constraint. This is systemic to
+tasks L, M and N.
 
-Retained runs are not deleted. Every verdict for tasks L, M and N across all
-preserved runs was checked, and **no passing M or N artifact exists anywhere**,
-including the two uncounted runs. Counting every attempt regardless of validity
-gives 0/6 and 0/9 rather than 0/5, so the exclusions do not manufacture the
-result. Four Fable quota failures, a too-short CLI preflight, an evidence-sealing
-abort caused by test-created symlinks, and a false authentication classifier that
-misread the source location `graph_binaries.py:401:` as an HTTP 401 are all
-recorded in the run evidence rather than discarded.
+**No counted trial exercised it.** All twenty graded sandboxes were diffed against
+the pristine workspaces and none modified anything under `conans/test/`. I am
+disclosing rather than patching because editing the verifier changes its hash and,
+under this project's own versioning rule, invalidates every trial graded under it.
+The fix — restore that tree from the pristine snapshot before overlaying hidden
+tests, and assert a nonzero passed-count with zero skips — is the first change
+required before this harness certifies a *pass*.
 
-## 8. AI assistance and ownership
+Related: Task M's verifier is narrower than Task M's specification. The hidden
+patch edits a test method the target list never runs, leaving two of three
+required missing-binary guidance strings unasserted, and the multi-remote search
+and remote-failure resilience the spec demands have no coverage at all. This makes
+M easier than advertised, which cuts against my own result.
 
-AI systems contributed substantially. Codex was the primary hands-on contributor
-for this round: it researched candidate directions, identified and packaged the
-Conan tasks, wrote the specifications, verifiers and harness fixes, ran and
-audited the experiments, and drafted this report. An independent Claude audit
-then reconstructed every number from the raw verdicts, found the grader tamper
-surface, the Task N specification gap and the Task M verifier narrowness above,
-and rewrote the claim language. Earlier Claude Code and agent-assisted audits
-built and corrected the first round. I set the objective and constraints,
-required the disclosure, reviewed the work, and decide what to submit. It would
-be misleading to imply I authored every line, and I cannot derive a reliable
-human-versus-AI percentage from Git history.
+### 4.5 The evidence sealer, and what cannot be proven
 
-## 9. Conclusion, and what would make it stronger
+The original sealer refused any symlink under a run directory. Because sealing
+runs inside `finalize_run` *after* every verdict is written, a symlink left by
+Conan's tests or by Fable's own virtualenv aborted two otherwise-complete runs at
+the last step. The sealer now hashes a symlink's own target string with a type
+marker and never follows it, with regression tests proving external target
+contents are ignored and link substitution is detected.
 
-Two frozen, real-world repository-evolution tasks on which both agents produced
-zero passing artifacts in five valid 900-second trials, with reproducible
-checksum-sealed evidence and the instrument's own defects disclosed. M is the
-clean discriminator; N sits at the boundary — 39/41 four times — with residual
-failures on behavior my specification underdetermines.
+**The limit:** the `aggregate.py` change is in version control and is confined to
+that behavior, but the matching pre-fix `run_all.py` exists in no commit and
+cannot be recovered, so "the change was post-grading and sealer-only" is
+corroborated rather than proven. Corroborating facts: the aborted run's own
+traceback shows the old sealer running after all verdicts were written; task,
+verifier, prompt, agent version, template, budget, grading timeout, concurrency
+and isolation attestation are identical across all three counted runs; and all
+three shipped bundles contain only regular files, so the change cannot affect
+their verification.
 
-In the order I would do it: fix the grader tamper surface and re-seal; tighten
-Task N's specification on lock/platform resolution ordering and rerun, which
-would separate the specification gap from the capability gap; preregister the
-task list and k; use post-cutoff upstream changes to remove the contamination
-confound; and add a same-budget human reference so "hard for agents" is compared
-against something rather than asserted. A single passing artifact under a
-materially identical replication would be important contradictory evidence, and I
-would report it rather than hide it.
+### 4.6 Other operational notes
 
-Verification commands are in [`README.md`](README.md).
+A five-second CLI version preflight failed both agents before any trial and was
+raised to 60 s. Earlier macOS sleep made wall-clock observation confusing, so the
+confirmation run was wrapped in `caffeinate`; this only kept the host awake and
+changed no task file, prompt, isolation setting or budget — though that is
+recorded from operating notes and is not recoverable from the run artifacts. The
+sealed quota verdicts record the generic `agent_nonzero_exit` reason; the "out of
+usage credits" message itself appears in the retained local agent logs.
+
+## 5. Claims withdrawn after audit
+
+Adversarial audits of earlier drafts found real errors, all corrected:
+
+- Fable Task C reported as "3/3" when the saved evidence showed 0/5, all
+  session-limited; Sol Task C reported as "5/5 clean" when it was 3/5.
+- "Reproduces every number" and "all versions pinned" — false when written.
+- "Anti-cheat by construction" — overstated while tasks A–D still graded
+  in-process.
+- The reward-hack described as having "passed 1/5" — not reproducible from
+  committed evidence.
+- "Fable never reward-hacks" — five trials inflated into a propensity claim.
+- A fabricated statistic ("CWE-208, 20–35%") attributed to a paper that does not
+  contain it, plus four further citation errors including a benchmark
+  misattributed to the wrong authors.
+- In this round: a diagnostic run's artifacts described as uniformly 38/41 when
+  two were 39/41.
+
+I would rather hand you a corrected report than a polished one. The same audit
+that produced this list also produced §4.4 and the Task N specification-gap
+finding in `README.md` §5.
+
+## 6. Standing limits
+
+Restated compactly, since they bound everything above: five trials per pair bound
+the true per-trial success rate below roughly 45%; the tasks survived an adaptive
+search over fourteen candidates; no human ran under the same budget; the solving
+phase is not network-isolated; both source PRs merged in late 2023 and may sit in
+the models' training data; every counted Fable trial left only a 15-byte log stub,
+so its reasoning cannot be reconstructed; and the evidence is self-sealed, with no
+external anchor proving the bundles came from these runs.
+
+Verification commands are in [`README.md`](README.md) §8.
