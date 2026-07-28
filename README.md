@@ -40,19 +40,12 @@ honest negative result that motivated the change of direction.
 | E | 0/5 both — but SHA-256 preimage search hardness, which a human could not beat in budget either |
 | I | 0 valid trials: both platforms refused on safety grounds. A policy boundary, not measured inability |
 
-`REPORT.md` covers that round, including three defects found and fixed in the
-harness itself.
-
 ## What is where
 
 | Path | Contents |
 |---|---|
-| [`STARTER_TASK_REPORT_V2.md`](STARTER_TASK_REPORT_V2.md) | **Current report.** Result, claim limits, instrument defects, disclosure record |
-| [`RESEARCH_LOG_V2.md`](RESEARCH_LOG_V2.md) | Chronology, screening funnel, per-run notes, known defects |
-| [`EMAIL_TO_PROF_KANG_V2.md`](EMAIL_TO_PROF_KANG_V2.md) | Cover note |
-| [`REPORT.md`](REPORT.md) | First-round (A–I) report |
-| [`TASK_SPECIFICATION.md`](TASK_SPECIFICATION.md) | Admissibility protocol (12 gates) and evaluation design |
-| [`tasks/`](tasks/) | Fourteen task packages. Each has an agent-visible `workspace/` and a hidden `verifier/` |
+| [`REPORT.md`](REPORT.md) | **The report.** Admissibility protocol, both rounds, result limits, instrument defects, disclosure |
+| [`tasks/`](tasks/) | Fourteen task packages, each with an agent-visible `workspace/` and a hidden `verifier/` |
 | [`evidence/runs/`](evidence/runs/) | Checksum-sealed manifests, preflight and verdicts for every reported run |
 | [`harness/`](harness/) | Runner, aggregator, isolation, out-of-process graders, regression tests |
 
@@ -182,4 +175,4 @@ model failures.
 - Isolation is benchmark-scoped; the solving phase is not network-isolated.
 - Both source PRs predate the models' training cutoffs.
 
-`STARTER_TASK_REPORT_V2.md` §5 and §7 give the full list with evidence.
+[`REPORT.md`](REPORT.md) §6 and §7 give the full list with evidence.
