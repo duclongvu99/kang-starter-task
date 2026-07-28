@@ -2,6 +2,13 @@
 
 **Author:** Long Duc Vu · **For:** Prof. Daniel Kang (starter task) · **Date:** 2026-07-19
 
+> **Status note (2026-07-28).** This is the first-round protocol document and is
+> retained as written. A second round later added five more task packages
+> (J–N) under the same gates, of which M and N are the reported result; the
+> repository therefore holds fourteen tasks, not the nine described below. The
+> current result, its limits, and the defects since found in the instrument are
+> in `STARTER_TASK_REPORT_V2.md`.
+
 ---
 
 ## 0. What this document is

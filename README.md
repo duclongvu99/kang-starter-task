@@ -1,88 +1,67 @@
 # Frontier coding-agent starter task
 
-This repository contains the starter-task submission prepared by Long Duc Vu for
-Prof. Daniel Kang. It studies how to make a reproducible, mechanically graded
-measurement of where a frontier coding agent stops succeeding under a fixed
-budget — and how much such a measurement can honestly claim.
+Starter-task submission prepared by Long Duc Vu for Prof. Daniel Kang. It asks
+how to make a reproducible, mechanically graded measurement of where a frontier
+coding agent stops succeeding under a fixed budget — and how much such a
+measurement can honestly claim.
 
-## July 28 second-round update
+Everything reported here regenerates from committed evidence with no API access.
+Jump to [Check the results](#check-the-results).
 
-The current result is in [`STARTER_TASK_REPORT_V2.md`](STARTER_TASK_REPORT_V2.md).
-After the original A–I search below, a second search packaged two long-horizon
-Conan repository-evolution tasks:
+## Results
 
-- **M — `conan graph explain`:** 0/5 passing artifacts from each agent in five
-  valid trials under the frozen 900-second configuration. Artifacts plateaued at
-  2–5 of 10 hidden tests; this is the clean discriminator.
-- **N — platform requirements:** 0/5 from each agent. Artifacts came close —
-  Fable 39/41 in each of its four final trials, Sol 38/41 at best — and the
-  residual failures sit on lockfile-ordering behavior the specification
-  underdetermines, so part of this gap is a specification gap. Four earlier
-  Fable attempts were invalid because the CLI account exhausted usage credits
-  and remain disclosed separately.
+**Current round — two long-horizon Conan repository-evolution tasks.** Frozen
+task snapshot, verifier and prompt; Claude Code 2.1.220 (`claude-fable-5`, ≤80
+turns) and Codex CLI 0.144.6 (`gpt-5.6-sol`, high reasoning); 900 s per attempt;
+benchmark-scoped macOS Seatbelt isolation.
 
-Read that as **two tasks with 0/5 observed under one configuration**, not as a
-demonstration that either model cannot do them: five trials with zero passes
-bound the per-trial success rate below roughly 45%, and both tasks are survivors
-of an adaptive search that discarded every candidate an agent solved. The report
-also discloses two defects in the instrument itself (a grader tamper surface no
-counted trial exercised, and a Task M verifier narrower than its own spec). The
-email draft is [`EMAIL_TO_PROF_KANG_V2.md`](EMAIL_TO_PROF_KANG_V2.md), and the
-experiment chronology is [`RESEARCH_LOG_V2.md`](RESEARCH_LOG_V2.md).
+| Task | Agent | Passing artifacts / valid trials | Invalid | Hidden-test scores |
+|---|---|---:|---:|---|
+| M — `conan graph explain` | Fable 5 | 0 / 5 | 0 | 2, 5, 2, 2, 2 of 10 |
+| M — `conan graph explain` | GPT-5.6 Sol | 0 / 5 | 0 | 2, 4, 4, 2, 4 of 10 |
+| N — platform requirements | Fable 5 | 0 / 5 | 4 quota | 29, 39, 39, 39, 39 of 41 |
+| N — platform requirements | GPT-5.6 Sol | 0 / 5 | 0 | 36, 36, 36, 38, 36 of 41 |
 
-The two new checksum-sealed evidence bundles reproduce independently:
+M is the clean discriminator. N sits at the boundary, and its residual failures
+land on lockfile-ordering behavior the specification underdetermines, so part of
+that gap is a specification gap. **Read this as 0/5 observed under one
+configuration, not as a demonstration that either model cannot do the work:**
+five trials with zero passes bound the per-trial success rate below roughly 45%,
+and both tasks are survivors of an adaptive search that discarded every
+candidate an agent solved.
 
-```bash
-python harness/aggregate.py --run-dir evidence/runs/20260725T224349.182262Z-8b9db2d7
-python harness/aggregate.py --run-dir evidence/runs/20260726T034819.662937Z-ae330dd8
-python harness/aggregate.py --run-dir evidence/runs/20260728T062925.254874Z-d6ec0450
-```
+**Earlier round — nine algorithmic, concurrency and security tasks (A–I).** The
+honest negative result that motivated the change of direction.
 
-The remainder of this README describes the earlier A–I round and is retained as
-part of the full-disclosure record.
+| Tasks | Outcome |
+|---|---|
+| A, B, D, F, G, H | Solved 5/5 by both agents |
+| C | Passing artifact in all 10 trials; Fable always past the 900 s cap, so a speed limit, not a capability gap |
+| E | 0/5 both — but SHA-256 preimage search hardness, which a human could not beat in budget either |
+| I | 0 valid trials: both platforms refused on safety grounds. A policy boundary, not measured inability |
 
-**Headline result:** across seven tasks and a 70-trial run (Claude Fable via Claude Code vs GPT-5.6
-Sol via Codex, k=5, 900 s each, **all 70 trials valid**), **six of the seven were solved by both
-agents.** The seventh is a SHA-256 preimage — search hardness, not a capability gap, and a declared
-exception to this suite's own admissibility gates. Two of the seven tasks were built *specifically*
-to find a capability gap, after the first five failed to; both were solved. The honest negative
-result, and the evidence that makes it checkable, is the submission.
+`REPORT.md` covers that round, including three defects found and fixed in the
+harness itself.
 
-Two further tasks were added afterward (their own runs): **H** (asymptotic scale-blindness) — solved
-10/10, a third purpose-built gap hunt defeated — and **I** (offensive-security exploit chaining), the
-one task neither agent completes, because **both platforms refuse it on safety grounds** rather than
-for lack of capability. See `REPORT.md`, "Two more gap hunts."
+## What is where
 
-**The finding I did not plan:** auditing all 70 transcripts of an earlier run revealed that the
-harness's own sandbox had disabled Claude Fable's shell in every one of its trials that left a readable transcript — 26 of 26 — it could not run the
-visible tests, a solver, or any command at all — and it produced a verifier-passing artifact in
-**every one of those 26**. That is the strongest evidence here that these tasks fall to reasoning
-rather than iteration, and simultaneously a validity defect in my own harness. I fixed it and re-ran
-everything: dead-shell signatures went from 26 of 26 readable transcripts to 0 of 27, the affected agent got 51–67% faster on
-four tasks, and the unaffected agent did not move. Both runs are committed so the comparison is
-checkable. Written up in `REPORT.md` under "Three defects in my own harness."
+| Path | Contents |
+|---|---|
+| [`STARTER_TASK_REPORT_V2.md`](STARTER_TASK_REPORT_V2.md) | **Current report.** Result, claim limits, instrument defects, disclosure record |
+| [`RESEARCH_LOG_V2.md`](RESEARCH_LOG_V2.md) | Chronology, screening funnel, per-run notes, known defects |
+| [`EMAIL_TO_PROF_KANG_V2.md`](EMAIL_TO_PROF_KANG_V2.md) | Cover note |
+| [`REPORT.md`](REPORT.md) | First-round (A–I) report |
+| [`TASK_SPECIFICATION.md`](TASK_SPECIFICATION.md) | Admissibility protocol (12 gates) and evaluation design |
+| [`tasks/`](tasks/) | Fourteen task packages. Each has an agent-visible `workspace/` and a hidden `verifier/` |
+| [`evidence/runs/`](evidence/runs/) | Checksum-sealed manifests, preflight and verdicts for every reported run |
+| [`harness/`](harness/) | Runner, aggregator, isolation, out-of-process graders, regression tests |
 
-## Start here
-
-- [`REPORT.md`](REPORT.md) — the short report: results, the Task E reward-hacking finding, three
-  defects found and fixed in my own harness, where the published gaps actually are, and the three
-  pre-registered tasks I would build next.
-- [`TASK_SPECIFICATION.md`](TASK_SPECIFICATION.md) — the admissibility protocol (12 gates) and
-  evaluation design.
-- [`evidence/runs/`](evidence/runs/) — committed provenance for every run: the two main runs (all 70
-  verdicts each) plus the standalone Task H and Task I runs. Every number in the report regenerates
-  from these directories.
-- [`evidence/`](evidence/) — the original in-process verifier, the observed frame-introspection
-  exploit against it, and an honest search attempt.
-- [`tasks/`](tasks/) — nine task workspaces with hidden mechanical verifiers and reference/known-bad
-  implementations. A–E are the first pass; F (concurrency), G (timing-safe comparison), and H
-  (asymptotic scale) were built to hunt for a capability gap and all three were solved; I
-  (exploit chaining) is the offensive-security task both agents refuse on policy grounds.
-- [`harness/`](harness/) — isolated execution, aggregation, and regression tests.
+Each task package keeps the trusted reference patch and hidden regression tests
+under `verifier/`, never inside the workspace the agent sees.
 
 ## Setup
 
-Python 3.11 or newer is recommended.
+Python 3.11 or newer.
 
 ```bash
 python -m venv .venv
@@ -90,74 +69,117 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-## Reproduce the reported numbers
+## Check the results
 
-No agent runs or API access needed — this reads the committed evidence:
+No agent runs or API access needed — these read the committed evidence.
 
 ```bash
-# the reported clean run (7 tasks A-G)
+# Current round: screening (k=1), confirmation (k=4), N/Fable replacements (k=4)
+python harness/aggregate.py --run-dir evidence/runs/20260725T224349.182262Z-8b9db2d7
+python harness/aggregate.py --run-dir evidence/runs/20260726T034819.662937Z-ae330dd8
+python harness/aggregate.py --run-dir evidence/runs/20260728T062925.254874Z-d6ec0450
+
+# Earlier round: the clean 70-trial run, the defective run kept for comparison,
+# and the standalone Task H and Task I runs
 python harness/aggregate.py --run-dir evidence/runs/20260725T030646.540246Z-f40db469
-
-# the earlier defective run, retained so the before/after comparison is checkable
 python harness/aggregate.py --run-dir evidence/runs/20260724T150421.630439Z-545ef5ed
-
-# the two follow-up tasks (own runs): H (scale, solved) and I (exploit chain, refused)
 python harness/aggregate.py --run-dir evidence/runs/20260725T152301.243134Z-d7bb0572
 python harness/aggregate.py --run-dir evidence/runs/20260725T162204.945673Z-16ac1626
 ```
 
-The aggregator verifies each bundle's SHA-256 digests and the run's isolation attestation before it
-will report anything, and refuses runs that are incomplete or not strictly isolated. Two practical
-notes: each bundle has two absolute path prefixes redacted (repository root and home directory — see
-the matching `…original-digests.json` for the pre-redaction digests and the exact mapping), and the
-digest check is exact about the file set, so a stray `.DS_Store` inside a bundle directory will make
-it fail with `unexpected=['.DS_Store']`.
+Expected: every row for tasks M and N reports `0 /` passes. The three current-round
+bundles carry 1, 4 and 4 trials per task-agent pair respectively; in the
+confirmation bundle N/fable shows `0 / 0` with `infra 4`, which is the quota
+failure recorded as invalid rather than as a model failure.
 
-## Validate the harness and verifiers
+Which run supplies which trial: the first valid trial of each pair comes from the
+screening run; trials 2–5 come from the confirmation run, except N/Fable, whose
+trials 2–5 come from the replacement run because its confirmation attempts were
+quota-invalid.
+
+The aggregator refuses to report anything unless the bundle's SHA-256 digests
+and exact file set match, the manifest is `completed`, the isolation attestation
+is present, and every verdict satisfies the schema. Two practical notes: each
+bundle has two absolute path prefixes redacted (repository root and home
+directory — the matching `…original-digests.json` holds the pre-redaction
+digests and the mapping), and the file-set check is exact, so a stray `.DS_Store`
+inside a bundle makes it fail with `unexpected=['.DS_Store']`.
+
+## Check the instrument
 
 ```bash
-python -m pytest -q harness/tests        # 60 tests; isolation tests skip
-                                         # where macOS Seatbelt is unavailable
+python -m pytest -q harness/tests
+```
 
-for task in \
-  A_untouchable_oracle \
-  B_sqlite_judge \
-  C_prove_it \
-  D_invariant \
-  E_preimage \
-  F_concurrency \
-  G_timing_safe \
-  H_asymptotic \
-  I_exploit_chain
+Expected: 60 passed from inside this repository. Two of the isolation tests skip
+where macOS Seatbelt is unavailable or when the suite runs outside the workspace
+root, so a fresh clone elsewhere reports 58 passed, 2 skipped.
+
+```bash
+python tasks/M_conan_graph_explain/verifier/verify.py --self-test
+python tasks/N_conan_platform_requires/verifier/verify.py --self-test
+```
+
+Expected: `"self_test_passed": true` with an empty `problems` list. Each self-test
+applies the trusted upstream reference to a copy of the frozen snapshot and
+requires it to pass every selected test (M 10/10, N 41/41), then grades the
+untouched snapshot and requires it to fail (M 2/10, N 11/41). No agent result is
+accepted from a task whose gate fails.
+
+The same gate for the earlier round:
+
+```bash
+for task in A_untouchable_oracle B_sqlite_judge C_prove_it D_invariant \
+            E_preimage F_concurrency G_timing_safe H_asymptotic I_exploit_chain
 do
   python "tasks/${task}/verifier/verify.py" --self-test
 done
 ```
 
-Each self-test validates its oracle on known ground truth, grades a correct reference solution
-and asserts it passes, grades known-bad solutions and asserts each fails on its intended mode,
-and confirms a trivial baseline fails. No agent result is accepted from a task whose gate fails.
-(Task E is the declared exception: no in-budget passing reference can exist without leaking the
-witness, so its self-test validates the *checking logic* on a throwaway instance — see
-`REPORT.md`.)
+Those self-tests additionally grade known-bad solutions and require each to fail
+on its intended mode. Task E is the declared exception: no in-budget passing
+reference can exist without leaking the witness, so its self-test validates the
+checking logic on a throwaway instance.
 
 ## Re-run the agent experiment
 
-Needs authenticated Claude Code and Codex CLIs. A complete run is intentionally expensive:
-seven tasks × two agents × five trials, up to 900 s each (~6 h wall clock). Preflight
-runs a live tooling check first (gate G12(e)): each agent must execute a command inside
-its real sandbox before any trial is scored, and the run fails closed if one cannot.
+Needs authenticated Claude Code and Codex CLIs, and is intentionally expensive —
+each trial may take the full 900 s. Preflight runs a live tooling check first:
+each agent must execute a command inside its real sandbox before any trial is
+scored, and the run fails closed if one cannot.
 
 ```bash
-python harness/run_all.py \
-  --tasks A,B,C,D,E,F,G \
-  --agents fable,sol \
-  --k 5 \
-  --budget 900 \
-  --isolation strict
+# current round
+python harness/run_all.py --tasks M,N --agents fable,sol --k 5 \
+                          --budget 900 --isolation strict
+
+# earlier round
+python harness/run_all.py --tasks A,B,C,D,E,F,G --agents fable,sol --k 5 \
+                          --budget 900 --isolation strict
 ```
 
-Fresh runs are written to `results/runs/<run-id>/` and are not committed: each full run directory is
-hundreds of megabytes of agent transcripts and 70 sandboxes. The committed `evidence/runs/` bundles
-carry the manifest, preflight and all 70 verdicts from each run — which is all the aggregator needs —
-with two path prefixes redacted and the pre-redaction digests published alongside.
+Fresh runs land in `results/runs/<run-id>/` and are not committed: a full run is
+hundreds of megabytes of transcripts and sandboxes. Export a sealed, redacted
+bundle from one with:
+
+```bash
+python harness/export_evidence.py --source-run results/runs/<run-id>
+```
+
+Grading is unconditional, so **a passing artifact counts as a solve even if the
+agent timed out or exited nonzero**. Quota failures, policy refusals, CLI crashes
+and verifier infrastructure failures are recorded as invalid trials and never as
+model failures.
+
+## Limits worth knowing before reading anything else
+
+- Five trials per pair; 0/5 bounds the true per-trial success rate below ~45%.
+- M and N survived an adaptive, non-preregistered search over ~14 candidates.
+- The grader treats pytest's exit code as its pass signal, so a submission that
+  edited `conans/test/conftest.py` could force a false pass. No counted trial did
+  — all twenty graded sandboxes were diffed — and it is disclosed rather than
+  patched because editing a verifier invalidates the trials graded under it.
+- Isolation is benchmark-scoped; the solving phase is not network-isolated.
+- Both source PRs predate the models' training cutoffs.
+
+`STARTER_TASK_REPORT_V2.md` §5 and §7 give the full list with evidence.
