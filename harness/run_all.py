@@ -54,6 +54,11 @@ TASK_DIRS = {
     "G": ROOT / "tasks" / "G_timing_safe",
     "H": ROOT / "tasks" / "H_asymptotic",
     "I": ROOT / "tasks" / "I_exploit_chain",
+    "J": ROOT / "tasks" / "J_durable_ledger",
+    "K": ROOT / "tasks" / "K_reentrant_store",
+    "L": ROOT / "tasks" / "L_conan_warnings",
+    "M": ROOT / "tasks" / "M_conan_graph_explain",
+    "N": ROOT / "tasks" / "N_conan_platform_requires",
 }
 
 PROMPT = (
@@ -347,7 +352,8 @@ AGENT_INFRA_PATTERNS = {
     # defect 3). A real auth failure names the failure or the status code.
     "authentication": re.compile(
         r"(?:authentication (?:failed|required|error)|invalid api key|not authenticated"
-        r"|\b401\b\s*(?:unauthorized)?|unauthorized:\s)",
+        r"|\b401\b\s+unauthorized|http (?:status )?401|status(?: code)? 401"
+        r"|unauthorized:\s)",
         re.I,
     ),
     "network": re.compile(
@@ -747,6 +753,22 @@ def one_trial(
         # Test/local injected runners predate the isolation argument. They are
         # never used by the experiment CLI and retain the small stable hook.
         agent_run = runner(sandbox, budget, agent_log)
+    # Agent CLIs and candidate tests use this directory only as private runtime
+    # scratch.  Conan's own tests legitimately create symlinks there; retaining
+    # those symlinks makes the fail-closed evidence sealer reject the whole run
+    # after every verdict has already been written.  Logs and the candidate
+    # sandbox are the evidence; remove only the explicit scratch directory.
+    runtime_scratch = tdir / "agent-private"
+    try:
+        shutil.rmtree(runtime_scratch)
+        agent_run["runtime_scratch_removed"] = True
+        agent_run["runtime_scratch_cleanup_error"] = None
+    except FileNotFoundError:
+        agent_run["runtime_scratch_removed"] = False
+        agent_run["runtime_scratch_cleanup_error"] = None
+    except OSError as exc:
+        agent_run["runtime_scratch_removed"] = False
+        agent_run["runtime_scratch_cleanup_error"] = f"{type(exc).__name__}: {exc}"
     verdict, verifier_run = grade(task, sandbox, grade_timeout, tdir / "verifier.log")
 
     agent_completed = (
@@ -831,6 +853,14 @@ def one_trial(
 
 def _hash_file(path: Path) -> str:
     digest = hashlib.sha256()
+    if path.is_symlink():
+        # Seal the link itself without following it. Candidate tools commonly
+        # create virtualenv links, and following them could hash host files
+        # outside the run. The type marker prevents a link target string from
+        # colliding with a regular file containing the same bytes.
+        digest.update(b"symlink\0")
+        digest.update(os.fsencode(os.readlink(path)))
+        return digest.hexdigest()
     with path.open("rb") as stream:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
@@ -856,15 +886,16 @@ def _evidence_files(run_dir: Path) -> list[Path]:
     files: list[Path] = []
     for current, directories, filenames in os.walk(run_dir, followlinks=False):
         current_path = Path(current)
-        for name in directories:
+        for name in list(directories):
             path = current_path / name
             if path.is_symlink():
-                raise ValueError(f"symlink directory forbidden in run evidence: {path}")
+                # os.walk(followlinks=False) does not traverse this directory;
+                # include the link entry itself in the checksum file set.
+                files.append(path)
+                directories.remove(name)
         for name in filenames:
             path = current_path / name
-            if path.is_symlink():
-                raise ValueError(f"symlink file forbidden in run evidence: {path}")
-            if not path.is_file():
+            if not path.is_symlink() and not path.is_file():
                 raise ValueError(f"non-regular file forbidden in run evidence: {path}")
             files.append(path)
     return sorted(files)
@@ -914,7 +945,10 @@ def _agent_version(agent: str) -> dict[str, Any]:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            timeout=5,
+            # Both authenticated CLIs can spend several seconds loading their
+            # bundled runtime/plugins even for --version.  Five seconds caused
+            # false preflight failures on an otherwise healthy installation.
+            timeout=60,
             check=False,
         )
         data["version"] = result.stdout.strip() or None

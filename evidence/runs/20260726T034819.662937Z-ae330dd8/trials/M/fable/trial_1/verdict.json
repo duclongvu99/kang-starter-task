@@ -1,0 +1,135 @@
+{
+  "agent_run": {
+    "command": [
+      "/usr/bin/sandbox-exec",
+      "-p",
+      "(version 1)\n(allow default)\n(deny file-read* file-write* (subpath \"/HOME/Documents/Long_VD_Infor/l_application\"))\n(deny file-write* (subpath \"/private/tmp\") (subpath \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T\"))\n(allow file-read-metadata (literal \"/HOME/Documents/Long_VD_Infor/l_application\") (literal \"/REPO\") (literal \"/REPO/.venv\") (literal \"/REPO/results\") (literal \"/REPO/results/runs\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/M\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/M/fable\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/M/fable/trial_1\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/M/fable/trial_1/agent-private\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/M/fable/trial_1/sandbox\"))\n(allow file-read* (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/M/fable/trial_1/sandbox\"))\n(allow file-read* file-write* (subpath \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/M/fable/trial_1/sandbox\"))\n(allow file-read* (literal \"/REPO/.venv\"))\n(allow file-read* (subpath \"/REPO/.venv\"))\n(allow file-read* file-write* (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/M/fable/trial_1/agent-private\"))\n(allow file-read* file-write* (subpath \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/M/fable/trial_1/agent-private\"))\n(allow file-write* (literal \"/private/tmp\"))\n(allow file-read* file-write* (literal \"/private/tmp/claude-501\"))\n(allow file-read* file-write* (subpath \"/private/tmp/claude-501\"))\n(allow file-write* (literal \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T\"))\n(allow file-read* file-write* (literal \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/claude-501\"))\n(allow file-read* file-write* (subpath \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/claude-501\"))",
+      "claude",
+      "-p",
+      "You are an autonomous coding agent working in the current working directory, which contains a self-contained coding task. Read README.md and SPEC.md first, then complete the task by creating/editing files in this directory. Follow every rule stated in README.md exactly. Verify your own work as best you can. Do not ask questions and do not stop early \u2014 produce the complete deliverable, then finish.",
+      "--model",
+      "claude-fable-5",
+      "--dangerously-skip-permissions",
+      "--max-turns",
+      "80"
+    ],
+    "execution_error": null,
+    "finished_at": "2026-07-26T04:06:24.348492Z",
+    "isolation": {
+      "available": true,
+      "backend": "darwin-seatbelt",
+      "capabilities": {
+        "agent_shared_temp_write_isolated": false,
+        "benchmark_secrets_isolated": null,
+        "candidate_isolated": null,
+        "candidate_network_isolated": null,
+        "candidate_private_temp_isolated": null,
+        "candidate_protocol_fd_isolated": null,
+        "candidate_submission_read_only": null,
+        "host_filesystem_isolated": false,
+        "sibling_trials_isolated": null,
+        "trial_write_isolated": false
+      },
+      "error": null,
+      "evidence": {
+        "dynamic_probe": [],
+        "unit_tested": [
+          "candidate_protocol_fd_isolated",
+          "candidate_process_group_cleanup",
+          "candidate_output_bounded"
+        ]
+      },
+      "requested": "strict",
+      "warning": "Benchmark-scoped isolation only: hidden verifier/oracle/reference and sibling trials are isolated, but authenticated agent CLIs retain host home/config access; whole-host filesystem and total write isolation are not claimed."
+    },
+    "log": "/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/M/fable/trial_1/agent.log",
+    "log_bytes": 15,
+    "log_cap_bytes": 67108864,
+    "log_overflow": false,
+    "returncode": -9,
+    "runtime_scratch_cleanup_error": null,
+    "runtime_scratch_removed": true,
+    "seconds": 901.039,
+    "started_at": "2026-07-26T03:51:23.298562Z",
+    "teardown_error": null,
+    "timed_out": true
+  },
+  "record": {
+    "agent": "fable",
+    "agent_completed": false,
+    "artifact_passed_verifier": false,
+    "failure_modes": [
+      "hidden_or_regression_tests_failed"
+    ],
+    "infra_error": false,
+    "passed": false,
+    "primary_success": false,
+    "returncode": -9,
+    "seconds": 901.039,
+    "status_reason": [
+      "agent_timeout",
+      "artifact_failed_verifier"
+    ],
+    "task": "M",
+    "timed_out": true,
+    "trial": 1,
+    "trial_valid": true,
+    "verifier_completed": true
+  },
+  "schema_version": 2,
+  "status": {
+    "agent_completed": false,
+    "artifact_passed_verifier": false,
+    "infra_error": false,
+    "primary_success": false,
+    "status_reason": [
+      "agent_timeout",
+      "artifact_failed_verifier"
+    ],
+    "trial_valid": true,
+    "verifier_completed": true
+  },
+  "verdict": {
+    "failure_modes": [
+      "hidden_or_regression_tests_failed"
+    ],
+    "passed": false,
+    "task": "M_conan_graph_explain",
+    "tests": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--disable-warnings",
+        "conans/test/integration/command_v2/test_graph_find_binaries.py",
+        "conans/test/functional/only_source_test.py::OnlySourceTest::test_build_policies_in_conanfile",
+        "conans/test/integration/command/install/install_missing_dep_test.py"
+      ],
+      "returncode": 1,
+      "seconds": 3.143,
+      "tail": "pkg1[\"diff\"][\"platform\"] == {}\nE       AssertionError: assert {'expected': ...existing': []} == {}\nE         \nE         Left contains 2 more items:\nE         {'existing': [], 'expected': []}\nE         Use -v to get more diff\n\nconans/test/integration/command_v2/test_graph_find_binaries.py:63: AssertionError\n___________________ TestFilterProfile.test_different_option ____________________\n\nself = <conans.test.integration.command_v2.test_graph_find_binaries.TestFilterProfile object at 0x107d75e00>\nclient = <conans.test.utils.tools.TestClient object at 0x10714da90>\n\n    def test_different_option(self, client):\n        # We find 1 closest match in Linux static\n        c = client\n        c.save({\"linux\": \"[settings]\\nos=Linux\\n[options]\\n*:shared=True\"})\n        c.run(\"graph explain --requires=lib/1.0 -pr linux\")\n        expected = textwrap.dedent(\"\"\"\\\n            remote: Local Cache\n            settings: Linux, Release\n            options: shared=False\n            diff\n              options\n                expected: shared=True\n                existing: shared=False\n              explanation: This binary was built with the same settings, but different options\n            \"\"\")\n        assert textwrap.indent(expected, \"      \") in c.out\n        c.run(\"graph explain --requires=lib/1.0 -pr linux --format=json\")\n        cache = json.loads(c.stdout)[\"closest_binaries\"]\n        revisions = cache[\"lib/1.0\"][\"revisions\"]\n        pkgs = revisions[\"5313a980ea0c56baeb582c510d6d9fbc\"][\"packages\"]\n        assert len(pkgs) == 1\n        pkg1 = pkgs[\"499989797d9192081b8f16f7d797b107a2edd8da\"]\n>       assert pkg1[\"diff\"][\"platform\"] == {}\nE       AssertionError: assert {'expected': ...existing': []} == {}\nE         \nE         Left contains 2 more items:\nE         {'existing': [], 'expected': []}\nE         Use -v to get more diff\n\nconans/test/integration/command_v2/test_graph_find_binaries.py:91: AssertionError\n___________________ TestFilterProfile.test_different_setting ___________________\n\nself = <conans.test.integration.command_v2.test_graph_find_binaries.TestFilterProfile object at 0x107d75f30>\nclient = <conans.test.utils.tools.TestClient object at 0x10714da90>\n\n    def test_different_setting(self, client):\n        # We find 1 closest match in Linux static\n        c = client\n        c.save({\"windows\": \"[settings]\\nos=Windows\\nbuild_type=Debug\\n[options]\\n*:shared=True\"})\n        c.run(\"graph explain --requires=lib/1.0 -pr windows\")\n        expected = textwrap.dedent(\"\"\"\\\n            remote: Local Cache\n            settings: Windows, Release\n            options: shared=True\n            diff\n              settings\n                expected: build_type=Debug\n                existing: build_type=Release\n              explanation: This binary was built with different settings.\n            \"\"\")\n        assert textwrap.indent(expected, \"      \") in c.out\n        c.run(\"graph explain --requires=lib/1.0 -pr windows --format=json\")\n        cache = json.loads(c.stdout)[\"closest_binaries\"]\n        revisions = cache[\"lib/1.0\"][\"revisions\"]\n        pkgs = revisions[\"5313a980ea0c56baeb582c510d6d9fbc\"][\"packages\"]\n        assert len(pkgs) == 1\n        pkg1 = pkgs[\"c2dd2d51b5074bdb5b7d717929372de09830017b\"]\n>       assert pkg1[\"diff\"][\"platform\"] == {}\nE       AssertionError: assert {'expected': ...existing': []} == {}\nE         \nE         Left contains 2 more items:\nE         {'existing': [], 'expected': []}\nE         Use -v to get more diff\n\nconans/test/integration/command_v2/test_graph_find_binaries.py:120: AssertionError\n__________________ TestFilterProfile.test_different_platform ___________________\n\nself = <conans.test.integration.command_v2.test_graph_find_binaries.TestFilterProfile object at 0x107df5250>\nclient = <conans.test.utils.tools.TestClient object at 0x10714da90>\n\n    def test_different_platform(self, client):\n        # We find closest match in other platforms\n        c = client\n        c.save({\"macos\": \"[settings]\\nos=Macos\\nbuild_type=Release\\n[options]\\n*:shared=True\"})\n        c.run(\"graph explain --requires=lib/1.0 -pr macos\")\n        expected = textwrap.dedent(\"\"\"\\\n            remote: Local Cache\n            settings: Windows, Release\n            options: shared=True\n            diff\n              platform\n                expected: os=Macos\n                existing: os=Windows\n              explanation: This binary belongs to another OS or Architecture, highly incompatible.\n            \"\"\")\n        assert textwrap.indent(expected, \"      \") in c.out\n        c.run(\"graph explain --requires=lib/1.0 -pr macos --format=json\")\n        cache = json.loads(c.stdout)[\"closest_binaries\"]\n        revisions = cache[\"lib/1.0\"][\"revisions\"]\n        pkgs = revisions[\"5313a980ea0c56baeb582c510d6d9fbc\"][\"packages\"]\n        assert len(pkgs) == 1\n        pkg1 = pkgs[\"c2dd2d51b5074bdb5b7d717929372de09830017b\"]\n        assert pkg1[\"diff\"][\"platform\"] == {'existing': ['os=Windows'], 'expected': ['os=Macos']}\n>       assert pkg1[\"diff\"][\"settings\"] == {}\nE       AssertionError: assert {'expected': ...existing': []} == {}\nE         \nE         Left contains 2 more items:\nE         {'existing': [], 'expected': []}\nE         Use -v to get more diff\n\nconans/test/integration/command_v2/test_graph_find_binaries.py:150: AssertionError\n=========================== short test summary info ============================\nFAILED conans/test/integration/command_v2/test_graph_find_binaries.py::TestFilterProfile::test_settings_exact_match_incomplete\nFAILED conans/test/integration/command_v2/test_graph_find_binaries.py::TestFilterProfile::test_settings_exact_match_complete\nFAILED conans/test/integration/command_v2/test_graph_find_binaries.py::TestFilterProfile::test_different_option\nFAILED conans/test/integration/command_v2/test_graph_find_binaries.py::TestFilterProfile::test_different_setting\nFAILED conans/test/integration/command_v2/test_graph_find_binaries.py::TestFilterProfile::test_different_platform\n5 failed, 5 passed, 21 warnings in 2.57s\n"
+    }
+  },
+  "verifier_run": {
+    "command": [
+      "/REPO/.venv/bin/python",
+      "/REPO/tasks/M_conan_graph_explain/verifier/verify.py",
+      "--submission",
+      "/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/M/fable/trial_1/sandbox"
+    ],
+    "completed": true,
+    "error": null,
+    "execution_error": null,
+    "finished_at": "2026-07-26T04:06:35.577689Z",
+    "log": "/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/M/fable/trial_1/verifier.log",
+    "log_bytes": 6874,
+    "log_cap_bytes": 67108864,
+    "log_overflow": false,
+    "returncode": 0,
+    "seconds": 6.507,
+    "started_at": "2026-07-26T04:06:29.070848Z",
+    "teardown_error": null,
+    "timed_out": false
+  }
+}

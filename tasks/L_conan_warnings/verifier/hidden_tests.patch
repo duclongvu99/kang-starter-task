@@ -1,0 +1,584 @@
+diff --git a/conans/test/integration/command/upload/upload_complete_test.py b/conans/test/integration/command/upload/upload_complete_test.py
+index ff9e20b62..a29368815 100644
+--- a/conans/test/integration/command/upload/upload_complete_test.py
++++ b/conans/test/integration/command/upload/upload_complete_test.py
+@@ -166,7 +166,7 @@ class UploadTest(unittest.TestCase):
+         client.run("install --requires=hello0/1.2.1@frodo/stable --build='*' -r default")
+         self._set_global_conf(client, retry=3, retry_wait=0)
+         client.run("upload hello* --confirm -r default")
+-        self.assertEqual(str(client.out).count("ERROR: Pair file, error!"), 5)
++        self.assertEqual(str(client.out).count("WARN: network: Pair file, error!"), 5)
+ 
+     def _set_global_conf(self, client, retry=None, retry_wait=None):
+         lines = []
+@@ -223,7 +223,7 @@ class UploadTest(unittest.TestCase):
+         client.run("install --requires=hello0/1.2.1@frodo/stable --build='*'")
+         self._set_global_conf(client, retry=3, retry_wait=0)
+         client.run("upload hello* --confirm -r default")
+-        self.assertEqual(str(client.out).count("ERROR: Pair file, error!"), 5)
++        self.assertEqual(str(client.out).count("WARN: network: Pair file, error!"), 5)
+ 
+     def test_upload_same_package_dont_compress(self):
+         client = self._get_client()
+diff --git a/conans/test/integration/command_v2/test_output.py b/conans/test/integration/command_v2/test_output.py
+new file mode 100644
+index 000000000..75e3afc1e
+--- /dev/null
++++ b/conans/test/integration/command_v2/test_output.py
+@@ -0,0 +1,254 @@
++import json
++import textwrap
++
++from conans.test.assets.genconanfile import GenConanfile
++from conans.test.utils.tools import TestClient
++from conans.util.env import environment_update
++
++
++class TestOutputLevel:
++    def test_invalid_output_level(self):
++        t = TestClient(light=True)
++        t.save({"conanfile.py": GenConanfile("foo", "1.0")})
++        t.run("create . -vfooling", assert_error=True)
++        assert "Invalid argument '-vfooling'"
++
++    def test_output_level(self):
++        lines = ("self.output.trace('This is a trace')",
++                 "self.output.debug('This is a debug')",
++                 "self.output.verbose('This is a verbose')",
++                 "self.output.info('This is a info')",
++                 "self.output.highlight('This is a highlight')",
++                 "self.output.success('This is a success')",
++                 "self.output.warning('This is a warning')",
++                 "self.output.error('This is a error')",
++                 )
++
++        t = TestClient(light=True)
++        t.save({"conanfile.py": GenConanfile("foo", "1.0").with_package(*lines)})
++
++        # By default, it prints > info
++        t.run("create .")
++        assert "This is a trace" not in t.out
++        assert "This is a debug" not in t.out
++        assert "This is a verbose" not in t.out
++        assert "This is a info" in t.out
++        assert "This is a highlight" in t.out
++        assert "This is a success" in t.out
++        assert "This is a warning" in t.out
++        assert "This is a error" in t.out
++
++        # Check if -v argument is equal to VERBOSE level
++        t.run("create . -v")
++        assert "This is a trace" not in t.out
++        assert "This is a debug" not in t.out
++        assert "This is a verbose" in t.out
++        assert "This is a info" in t.out
++        assert "This is a highlight" in t.out
++        assert "This is a success" in t.out
++        assert "This is a warning" in t.out
++        assert "This is a error" in t.out
++
++        # Print also verbose traces
++        t.run("create . -vverbose")
++        assert "This is a trace" not in t.out
++        assert "This is a debug" not in t.out
++        assert "This is a verbose" in t.out
++        assert "This is a info" in t.out
++        assert "This is a highlight" in t.out
++        assert "This is a success" in t.out
++        assert "This is a warning" in t.out
++        assert "This is a error" in t.out
++
++        # Print also debug traces
++        t.run("create . -vv")
++        assert "This is a trace" not in t.out
++        assert "This is a debug" in t.out
++        assert "This is a verbose" in t.out
++        assert "This is a info" in t.out
++        assert "This is a highlight" in t.out
++        assert "This is a success" in t.out
++        assert "This is a warning" in t.out
++        assert "This is a error" in t.out
++        t.run("create . -vdebug")
++        assert "This is a trace" not in t.out
++        assert "This is a debug" in t.out
++        assert "This is a verbose" in t.out
++        assert "This is a info" in t.out
++        assert "This is a highlight" in t.out
++        assert "This is a success" in t.out
++        assert "This is a warning" in t.out
++        assert "This is a error" in t.out
++
++        # Print also "trace" traces
++        t.run("create . -vvv")
++        assert "This is a trace" in t.out
++        assert "This is a debug" in t.out
++        assert "This is a verbose" in t.out
++        assert "This is a info" in t.out
++        assert "This is a highlight" in t.out
++        assert "This is a success" in t.out
++        assert "This is a warning" in t.out
++        assert "This is a error" in t.out
++        t.run("create . -vtrace")
++        assert "This is a trace" in t.out
++        assert "This is a debug" in t.out
++        assert "This is a verbose" in t.out
++        assert "This is a info" in t.out
++        assert "This is a highlight" in t.out
++        assert "This is a success" in t.out
++        assert "This is a warning" in t.out
++        assert "This is a error" in t.out
++
++        # With notice
++        t.run("create . -vstatus")
++        assert "This is a trace" not in t.out
++        assert "This is a debug" not in t.out
++        assert "This is a verbose" not in t.out
++        assert "This is a info" in t.out
++        assert "This is a highlight" in t.out
++        assert "This is a success" in t.out
++        assert "This is a warning" in t.out
++        assert "This is a error" in t.out
++
++        # With notice
++        t.run("create . -vnotice")
++        assert "This is a trace" not in t.out
++        assert "This is a debug" not in t.out
++        assert "This is a verbose" not in t.out
++        assert "This is a info" not in t.out
++        assert "This is a highlight" in t.out
++        assert "This is a success" in t.out
++        assert "This is a warning" in t.out
++        assert "This is a error" in t.out
++
++        # With warnings
++        t.run("create . -vwarning")
++        assert "This is a trace" not in t.out
++        assert "This is a debug" not in t.out
++        assert "This is a verbose" not in t.out
++        assert "This is a info" not in t.out
++        assert "This is a highlight" not in t.out
++        assert "This is a success" not in t.out
++        assert "This is a warning" in t.out
++        assert "This is a error" in t.out
++
++        # With errors
++        t.run("create . -verror")
++        assert "This is a trace" not in t.out
++        assert "This is a debug" not in t.out
++        assert "This is a verbose" not in t.out
++        assert "This is a info" not in t.out
++        assert "This is a highlight" not in t.out
++        assert "This is a success" not in t.out
++        assert "This is a warning" not in t.out
++        assert "This is a error" in t.out
++
++
++def test_output_level_envvar():
++    lines = ("self.output.trace('This is a trace')",
++             "self.output.debug('This is a debug')",
++             "self.output.verbose('This is a verbose')",
++             "self.output.info('This is a info')",
++             "self.output.highlight('This is a highlight')",
++             "self.output.success('This is a success')",
++             "self.output.warning('This is a warning')",
++             "self.output.error('This is a error')",
++             )
++
++    t = TestClient(light=True)
++    t.save({"conanfile.py": GenConanfile().with_package(*lines)})
++
++    # Check if -v argument is equal to VERBOSE level
++    with environment_update({"CONAN_LOG_LEVEL": "verbose"}):
++        t.run("create . --name foo --version 1.0")
++        assert "This is a trace" not in t.out
++        assert "This is a debug" not in t.out
++        assert "This is a verbose" in t.out
++        assert "This is a info" in t.out
++        assert "This is a highlight" in t.out
++        assert "This is a success" in t.out
++        assert "This is a warning" in t.out
++        assert "This is a error" in t.out
++
++        # Check if -v argument is equal to VERBOSE level
++    with environment_update({"CONAN_LOG_LEVEL": "error"}):
++        t.run("create . --name foo --version 1.0")
++        assert "This is a trace" not in t.out
++        assert "This is a debug" not in t.out
++        assert "This is a verbose" not in t.out
++        assert "This is a info" not in t.out
++        assert "This is a highlight" not in t.out
++        assert "This is a success" not in t.out
++        assert "This is a warning" not in t.out
++        assert "This is a error" in t.out
++
++
++class TestWarningHandling:
++    warning_lines = ("self.output.warning('Tagged warning', warn_tag='tag')",
++             "self.output.warning('Untagged warning')")
++    error_lines = ("self.output.error('Tagged error', error_type='exception')",
++                   "self.output.error('Untagged error')")
++
++    def test_warning_as_error(self):
++        t = TestClient(light=True)
++        t.save({"conanfile.py": GenConanfile("foo", "1.0").with_package(*self.warning_lines)})
++
++        t.save_home({"global.conf": "core:warnings_as_errors=False"})
++        t.run("create . -vwarning")
++        assert "WARN: Untagged warning" in t.out
++        assert "WARN: tag: Tagged warning" in t.out
++
++        t.save_home({"global.conf": "core:warnings_as_errors=True"})
++        t.run("create . -vwarning", assert_error=True)
++        assert "ConanException: tag: Tagged warning" in t.out
++        # We bailed early, didn't get a chance to print this one
++        assert "Untagged warning" not in t.out
++
++        t.save_home({"global.conf": """core:warnings_as_errors=True\ncore:skip_warnings=["tag"]"""})
++        t.run("create . -verror", assert_error=True)
++        assert "ConanException: Untagged warning" in t.out
++        assert "Tagged warning" not in t.out
++
++        t.save_home({"global.conf": "core:warnings_as_errors=False"})
++        t.run("create . -verror")
++        assert "ERROR: Untagged warning" not in t.out
++        assert "ERROR: tag: Tagged warning" not in t.out
++
++    def test_skip_warnings(self):
++        t = TestClient(light=True)
++        t.save({"conanfile.py": GenConanfile("foo", "1.0").with_package(*self.warning_lines)})
++
++        t.save_home({"global.conf": "core:skip_warnings=[]"})
++        t.run("create . -vwarning")
++        assert "WARN: Untagged warning" in t.out
++        assert "WARN: tag: Tagged warning" in t.out
++
++        t.save_home({"global.conf": "core:skip_warnings=['tag']"})
++        t.run("create . -vwarning")
++        assert "WARN: Untagged warning" in t.out
++        assert "WARN: tag: Tagged warning" not in t.out
++
++        t.save_home({"global.conf": "core:skip_warnings=['unknown']"})
++        t.run("create . -vwarning")
++        assert "WARN: Untagged warning" not in t.out
++        assert "WARN: tag: Tagged warning" in t.out
++
++        t.save_home({"global.conf": "core:skip_warnings=['unknown', 'tag']"})
++        t.run("create . -vwarning")
++        assert "WARN: Untagged warning" not in t.out
++        assert "WARN: tag: Tagged warning" not in t.out
++
++    def test_exception_errors(self):
++        t = TestClient(light=True)
++        t.save({"conanfile.py": GenConanfile("foo", "1.0").with_package(*self.error_lines)})
++
++        t.save_home({"global.conf": "core:warnings_as_errors=False"})
++        t.run("create .")
++        assert "ERROR: Tagged error" in t.out
++        assert "ERROR: Untagged error" in t.out
++
++        t.save_home({"global.conf": "core:warnings_as_errors=True"})
++        t.run("create .", assert_error=True)
++        assert "ERROR: Tagged error" in t.out
++        assert "ConanException: Untagged error" in t.out
+diff --git a/conans/test/integration/command_v2/test_output_level.py b/conans/test/integration/command_v2/test_output_level.py
+deleted file mode 100644
+index 68d4f45e3..000000000
+--- a/conans/test/integration/command_v2/test_output_level.py
++++ /dev/null
+@@ -1,183 +0,0 @@
+-from conans.test.assets.genconanfile import GenConanfile
+-from conans.test.utils.tools import TestClient
+-from conans.util.env import environment_update
+-
+-
+-def test_invalid_output_level():
+-    t = TestClient()
+-    t.save({"conanfile.py": GenConanfile()})
+-    t.run("create . --name foo --version 1.0 -vfooling", assert_error=True)
+-    assert "Invalid argument '-vfooling'"
+-
+-
+-def test_output_level():
+-
+-    lines = ("self.output.trace('This is a trace')",
+-             "self.output.debug('This is a debug')",
+-             "self.output.verbose('This is a verbose')",
+-             "self.output.info('This is a info')",
+-             "self.output.highlight('This is a highlight')",
+-             "self.output.success('This is a success')",
+-             "self.output.warning('This is a warning')",
+-             "self.output.error('This is a error')",
+-             )
+-
+-    t = TestClient()
+-    t.save({"conanfile.py": GenConanfile().with_package(*lines)})
+-
+-    # By default, it prints > info
+-    t.run("create . --name foo --version 1.0")
+-    assert "This is a trace" not in t.out
+-    assert "This is a debug" not in t.out
+-    assert "This is a verbose" not in t.out
+-    assert "This is a info" in t.out
+-    assert "This is a highlight" in t.out
+-    assert "This is a success" in t.out
+-    assert "This is a warning" in t.out
+-    assert "This is a error" in t.out
+-
+-    # Check if -v argument is equal to VERBOSE level
+-    t.run("create . --name foo --version 1.0 -v")
+-    assert "This is a trace" not in t.out
+-    assert "This is a debug" not in t.out
+-    assert "This is a verbose" in t.out
+-    assert "This is a info" in t.out
+-    assert "This is a highlight" in t.out
+-    assert "This is a success" in t.out
+-    assert "This is a warning" in t.out
+-    assert "This is a error" in t.out
+-
+-    # Print also verbose traces
+-    t.run("create . --name foo --version 1.0 -vverbose")
+-    assert "This is a trace" not in t.out
+-    assert "This is a debug" not in t.out
+-    assert "This is a verbose" in t.out
+-    assert "This is a info" in t.out
+-    assert "This is a highlight" in t.out
+-    assert "This is a success" in t.out
+-    assert "This is a warning" in t.out
+-    assert "This is a error" in t.out
+-
+-    # Print also debug traces
+-    t.run("create . --name foo --version 1.0 -vv")
+-    assert "This is a trace" not in t.out
+-    assert "This is a debug" in t.out
+-    assert "This is a verbose" in t.out
+-    assert "This is a info" in t.out
+-    assert "This is a highlight" in t.out
+-    assert "This is a success" in t.out
+-    assert "This is a warning" in t.out
+-    assert "This is a error" in t.out
+-    t.run("create . --name foo --version 1.0 -vdebug")
+-    assert "This is a trace" not in t.out
+-    assert "This is a debug" in t.out
+-    assert "This is a verbose" in t.out
+-    assert "This is a info" in t.out
+-    assert "This is a highlight" in t.out
+-    assert "This is a success" in t.out
+-    assert "This is a warning" in t.out
+-    assert "This is a error" in t.out
+-
+-    # Print also "trace" traces
+-    t.run("create . --name foo --version 1.0 -vvv")
+-    assert "This is a trace" in t.out
+-    assert "This is a debug" in t.out
+-    assert "This is a verbose" in t.out
+-    assert "This is a info" in t.out
+-    assert "This is a highlight" in t.out
+-    assert "This is a success" in t.out
+-    assert "This is a warning" in t.out
+-    assert "This is a error" in t.out
+-    t.run("create . --name foo --version 1.0 -vtrace")
+-    assert "This is a trace" in t.out
+-    assert "This is a debug" in t.out
+-    assert "This is a verbose" in t.out
+-    assert "This is a info" in t.out
+-    assert "This is a highlight" in t.out
+-    assert "This is a success" in t.out
+-    assert "This is a warning" in t.out
+-    assert "This is a error" in t.out
+-
+-    # With notice
+-    t.run("create . --name foo --version 1.0 -vstatus")
+-    assert "This is a trace" not in t.out
+-    assert "This is a debug" not in t.out
+-    assert "This is a verbose" not in t.out
+-    assert "This is a info" in t.out
+-    assert "This is a highlight" in t.out
+-    assert "This is a success" in t.out
+-    assert "This is a warning" in t.out
+-    assert "This is a error" in t.out
+-
+-    # With notice
+-    t.run("create . --name foo --version 1.0 -vnotice")
+-    assert "This is a trace" not in t.out
+-    assert "This is a debug" not in t.out
+-    assert "This is a verbose" not in t.out
+-    assert "This is a info" not in t.out
+-    assert "This is a highlight" in t.out
+-    assert "This is a success" in t.out
+-    assert "This is a warning" in t.out
+-    assert "This is a error" in t.out
+-
+-    # With warnings
+-    t.run("create . --name foo --version 1.0 -vwarning")
+-    assert "This is a trace" not in t.out
+-    assert "This is a debug" not in t.out
+-    assert "This is a verbose" not in t.out
+-    assert "This is a info" not in t.out
+-    assert "This is a highlight" not in t.out
+-    assert "This is a success" not in t.out
+-    assert "This is a warning" in t.out
+-    assert "This is a error" in t.out
+-
+-    # With errors
+-    t.run("create . --name foo --version 1.0 -verror")
+-    assert "This is a trace" not in t.out
+-    assert "This is a debug" not in t.out
+-    assert "This is a verbose" not in t.out
+-    assert "This is a info" not in t.out
+-    assert "This is a highlight" not in t.out
+-    assert "This is a success" not in t.out
+-    assert "This is a warning" not in t.out
+-    assert "This is a error" in t.out
+-
+-
+-def test_output_level_envvar():
+-
+-    lines = ("self.output.trace('This is a trace')",
+-             "self.output.debug('This is a debug')",
+-             "self.output.verbose('This is a verbose')",
+-             "self.output.info('This is a info')",
+-             "self.output.highlight('This is a highlight')",
+-             "self.output.success('This is a success')",
+-             "self.output.warning('This is a warning')",
+-             "self.output.error('This is a error')",
+-             )
+-
+-    t = TestClient()
+-    t.save({"conanfile.py": GenConanfile().with_package(*lines)})
+-
+-    # Check if -v argument is equal to VERBOSE level
+-    with environment_update({"CONAN_LOG_LEVEL": "verbose"}):
+-        t.run("create . --name foo --version 1.0")
+-        assert "This is a trace" not in t.out
+-        assert "This is a debug" not in t.out
+-        assert "This is a verbose" in t.out
+-        assert "This is a info" in t.out
+-        assert "This is a highlight" in t.out
+-        assert "This is a success" in t.out
+-        assert "This is a warning" in t.out
+-        assert "This is a error" in t.out
+-
+-        # Check if -v argument is equal to VERBOSE level
+-    with environment_update({"CONAN_LOG_LEVEL": "error"}):
+-        t.run("create . --name foo --version 1.0")
+-        assert "This is a trace" not in t.out
+-        assert "This is a debug" not in t.out
+-        assert "This is a verbose" not in t.out
+-        assert "This is a info" not in t.out
+-        assert "This is a highlight" not in t.out
+-        assert "This is a success" not in t.out
+-        assert "This is a warning" not in t.out
+-        assert "This is a error" in t.out
+diff --git a/conans/test/integration/remote/broken_download_test.py b/conans/test/integration/remote/broken_download_test.py
+index ee7b0f617..bd23e7f4b 100644
+--- a/conans/test/integration/remote/broken_download_test.py
++++ b/conans/test/integration/remote/broken_download_test.py
+@@ -112,7 +112,7 @@ def test_client_retries():
+     client = TestClient(servers=servers, inputs=["admin", "password"],
+                         requester_class=DownloadFilesBrokenRequesterTimesOne)
+     client.run("install --requires=lib/1.0@lasote/stable")
+-    assert "ERROR: Error downloading file" in client.out
++    assert "WARN: network: Error downloading file" in client.out
+     assert 'Fake connection error exception' in client.out
+     assert 1 == str(client.out).count("Waiting 0 seconds to retry...")
+ 
+diff --git a/conans/test/integration/remote/retry_test.py b/conans/test/integration/remote/retry_test.py
+index 7fa6dd746..e9829a733 100644
+--- a/conans/test/integration/remote/retry_test.py
++++ b/conans/test/integration/remote/retry_test.py
+@@ -106,7 +106,7 @@ class RetryDownloadTests(unittest.TestCase):
+                 uploader.upload(url="fake", abs_path=self.filename, retry=2)
+             output_lines = output.getvalue().splitlines()
+             counter = Counter(output_lines)
+-            self.assertEqual(counter["ERROR: any exception"], 2)
++            self.assertEqual(counter["WARN: network: any exception"], 2)
+             self.assertEqual(counter["Waiting 0 seconds to retry..."], 2)
+ 
+     def test_error_500(self):
+@@ -118,5 +118,5 @@ class RetryDownloadTests(unittest.TestCase):
+                 uploader.upload(url="fake", abs_path=self.filename, retry=2)
+             output_lines = output.getvalue().splitlines()
+             counter = Counter(output_lines)
+-            self.assertEqual(counter["ERROR: 500 Server Error: content"], 2)
++            self.assertEqual(counter["WARN: network: 500 Server Error: content"], 2)
+             self.assertEqual(counter["Waiting 0 seconds to retry..."], 2)
+diff --git a/conans/test/unittests/tools/files/test_patches.py b/conans/test/unittests/tools/files/test_patches.py
+index 4814ca815..6c3cc9b7f 100644
+--- a/conans/test/unittests/tools/files/test_patches.py
++++ b/conans/test/unittests/tools/files/test_patches.py
+@@ -42,11 +42,10 @@ def test_single_patch_file(mock_patch_ng):
+     conanfile.folders.set_base_export_sources("/my_source")
+     conanfile.display_name = 'mocked/ref'
+     patch(conanfile, patch_file='patch-file')
+-    assert mock_patch_ng.filename.replace('\\', '/') == '/my_source/patch-file'
++    assert mock_patch_ng.filename.replace("\\", "/") == '/my_source/patch-file'
+     assert mock_patch_ng.string is None
+-    assert mock_patch_ng.apply_args[0].replace('\\', '/') == '/my_source'
+-    assert mock_patch_ng.apply_args[1] == 0
+-    assert mock_patch_ng.apply_args[2] is False
++    assert mock_patch_ng.apply_args == ("/my_source", 0, False)
++
+ 
+ def test_single_patch_file_from_forced_build(mock_patch_ng):
+     conanfile = ConanFileMock()
+@@ -56,9 +55,7 @@ def test_single_patch_file_from_forced_build(mock_patch_ng):
+     patch(conanfile, patch_file='/my_build/patch-file')
+     assert mock_patch_ng.filename == '/my_build/patch-file'
+     assert mock_patch_ng.string is None
+-    assert mock_patch_ng.apply_args[0].replace('\\', '/') == '/my_source'
+-    assert mock_patch_ng.apply_args[1] == 0
+-    assert mock_patch_ng.apply_args[2] is False
++    assert mock_patch_ng.apply_args == ("/my_source", 0, False)
+ 
+ 
+ def test_base_path(mock_patch_ng):
+@@ -68,7 +65,7 @@ def test_base_path(mock_patch_ng):
+     conanfile.folders.source = "src"  # This not applies to find the patch file but for applying it
+     conanfile.display_name = 'mocked/ref'
+     patch(conanfile, patch_file='patch-file', base_path="subfolder")
+-    assert mock_patch_ng.filename.replace('\\', '/') == 'my_source/patch-file'
++    assert mock_patch_ng.filename.replace("\\", "/") == 'my_source/patch-file'
+     assert mock_patch_ng.string is None
+     assert mock_patch_ng.apply_args == (os.path.join("my_source", "src", "subfolder"), 0, False)
+ 
+@@ -79,9 +76,9 @@ def test_apply_in_build_from_patch_in_source(mock_patch_ng):
+     conanfile.folders.set_base_export_sources("/my_source")
+     conanfile.display_name = 'mocked/ref'
+     patch(conanfile, patch_file='patch-file', base_path="/my_build/subfolder")
+-    assert mock_patch_ng.filename.replace('\\', '/') == '/my_source/patch-file'
++    assert mock_patch_ng.filename.replace("\\", "/") == '/my_source/patch-file'
+     assert mock_patch_ng.string is None
+-    assert mock_patch_ng.apply_args[0] == os.path.join("/my_build", "subfolder").replace('\\', '/')
++    assert mock_patch_ng.apply_args[0] == os.path.join("/my_build", "subfolder").replace("\\", "/")
+     assert mock_patch_ng.apply_args[1] == 0
+     assert mock_patch_ng.apply_args[2] is False
+ 
+@@ -105,10 +102,8 @@ def test_single_patch_arguments(mock_patch_ng):
+     conanfile.folders.set_base_source("/path/to/sources")
+     conanfile.folders.set_base_export_sources("/path/to/sources")
+     patch(conanfile, patch_file='patch-file', strip=23, fuzz=True)
+-    assert mock_patch_ng.filename.replace('\\', '/') == '/path/to/sources/patch-file'
+-    assert mock_patch_ng.apply_args[0].replace('\\', '/') == "/path/to/sources"
+-    assert mock_patch_ng.apply_args[1] == 23
+-    assert mock_patch_ng.apply_args[2] is True
++    assert mock_patch_ng.filename.replace("\\", "/") == '/path/to/sources/patch-file'
++    assert mock_patch_ng.apply_args == ("/path/to/sources", 23, True)
+ 
+ 
+ def test_single_patch_type(mock_patch_ng):
+diff --git a/conans/test/unittests/tools/gnu/autotools_test.py b/conans/test/unittests/tools/gnu/autotools_test.py
+index 0ffc24e9c..5b539ee22 100644
+--- a/conans/test/unittests/tools/gnu/autotools_test.py
++++ b/conans/test/unittests/tools/gnu/autotools_test.py
+@@ -28,8 +28,8 @@ def test_source_folder_works(chdir_mock):
+     assert conanfile.command.replace("\\", "/") == '"/path/to/sources/configure" -foo bar '
+ 
+     autotools.autoreconf(build_script_folder="subfolder")
+-    chdir_mock.assert_called_with(autotools, os.path.normpath(os.path.join("/path/to/sources", "subfolder")))
++    chdir_mock.assert_called_with(autotools, os.path.join("/path/to/sources", "subfolder"))
+ 
+     autotools.autoreconf()
+-    chdir_mock.assert_called_with(autotools, os.path.normpath("/path/to/sources"))
+-    assert conanfile.command == 'autoreconf -bar foo'
++    chdir_mock.assert_called_with(autotools, "/path/to/sources")
++    assert conanfile.command.replace("\\", "/") == 'autoreconf -bar foo'

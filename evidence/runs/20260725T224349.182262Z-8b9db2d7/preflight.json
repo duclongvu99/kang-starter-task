@@ -1,0 +1,234 @@
+{
+  "agents": {
+    "fable": {
+      "error": null,
+      "executable": "claude",
+      "passed": true,
+      "path": "/HOME/.local/bin/claude",
+      "tool_check": {
+        "agent": "fable",
+        "agent_run": {
+          "execution_error": null,
+          "returncode": 0,
+          "seconds": 28.757,
+          "teardown_error": null,
+          "timed_out": false
+        },
+        "error": null,
+        "observed": "TOOLCHECK_OK",
+        "passed": true
+      },
+      "version": "2.1.220 (Claude Code)",
+      "version_returncode": 0
+    },
+    "sol": {
+      "error": null,
+      "executable": "codex",
+      "passed": true,
+      "path": "/opt/homebrew/bin/codex",
+      "tool_check": {
+        "agent": "sol",
+        "agent_run": {
+          "execution_error": null,
+          "returncode": 0,
+          "seconds": 22.596,
+          "teardown_error": null,
+          "timed_out": false
+        },
+        "error": null,
+        "observed": "TOOLCHECK_OK",
+        "passed": true
+      },
+      "version": "codex-cli 0.144.6",
+      "version_returncode": 0
+    }
+  },
+  "isolation": {
+    "available": true,
+    "backend": "darwin-seatbelt",
+    "capabilities": {
+      "agent_shared_temp_write_isolated": false,
+      "benchmark_secrets_isolated": true,
+      "candidate_isolated": true,
+      "candidate_network_isolated": true,
+      "candidate_private_temp_isolated": true,
+      "candidate_protocol_fd_isolated": null,
+      "candidate_submission_read_only": true,
+      "host_filesystem_isolated": false,
+      "sibling_trials_isolated": true,
+      "trial_write_isolated": false
+    },
+    "error": null,
+    "evidence": {
+      "dynamic_probe": [
+        "benchmark_secrets_isolated",
+        "sibling_trials_isolated",
+        "candidate_isolated",
+        "candidate_network_isolated",
+        "candidate_submission_read_only",
+        "candidate_private_temp_isolated"
+      ],
+      "unit_tested": [
+        "candidate_protocol_fd_isolated",
+        "candidate_process_group_cleanup",
+        "candidate_output_bounded"
+      ]
+    },
+    "requested": "strict",
+    "warning": "Benchmark-scoped isolation only: hidden verifier/oracle/reference and sibling trials are isolated, but authenticated agent CLIs retain host home/config access; whole-host filesystem and total write isolation are not claimed."
+  },
+  "passed": true,
+  "tasks": {
+    "M": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "/REPO/tasks/M_conan_graph_explain/verifier/verify.py",
+        "--self-test"
+      ],
+      "execution_error": null,
+      "finished_at": "2026-07-25T23:00:09.794113Z",
+      "log": "/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/preflight/M.log",
+      "log_bytes": 7850,
+      "log_cap_bytes": 67108864,
+      "log_overflow": false,
+      "parse_error": null,
+      "passed": true,
+      "process_passed": true,
+      "returncode": 0,
+      "seconds": 19.046,
+      "self_test": {
+        "baseline": {
+          "failure_modes": [
+            "hidden_or_regression_tests_failed"
+          ],
+          "passed": false,
+          "task": "M_conan_graph_explain",
+          "tests": {
+            "command": [
+              "/REPO/.venv/bin/python",
+              "-m",
+              "pytest",
+              "-q",
+              "--disable-warnings",
+              "conans/test/integration/command_v2/test_graph_find_binaries.py",
+              "conans/test/functional/only_source_test.py::OnlySourceTest::test_build_policies_in_conanfile",
+              "conans/test/integration/command/install/install_missing_dep_test.py"
+            ],
+            "returncode": 1,
+            "seconds": 1.942,
+            "tail": "     ~~~~~~~~~~~~~~~~~^^^^^^^\nE             File \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/M_conan_graph_explain_grade_brkvy73z/candidate/conan/cli/command.py\", line 103, in parse_args\nE               args = super().parse_args(args)\nE             File \"/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py\", line 1898, in parse_args\nE               args, argv = self.parse_known_args(args, namespace)\nE                            ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\nE             File \"/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py\", line 1908, in parse_known_args\nE               return self._parse_known_args2(args, namespace, intermixed=False)\nE                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE             File \"/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py\", line 1939, in _parse_known_args2\nE               self.error(str(err))\nE               ~~~~~~~~~~^^^^^^^^^^\nE             File \"/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py\", line 2658, in error\nE               self.exit(2, _('%(prog)s: error: %(message)s\\n') % args)\nE               ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE             File \"/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py\", line 2645, in exit\nE               _sys.exit(status)\nE               ~~~~~~~~~^^^^^^^^\nE           SystemExit: 2\n\nconans/test/utils/tools.py:600: Exception\n______________ InstallMissingDependency.test_missing_multiple_dep ______________\n\nself = <conans.test.integration.command.install.install_missing_dep_test.InstallMissingDependency testMethod=test_missing_multiple_dep>\n\n    def test_missing_multiple_dep(self):\n        client = TestClient()\n    \n        dep1_conanfile = GenConanfile()\n        client.save({\"conanfile.py\": dep1_conanfile}, clean_first=True)\n        client.run(\"export . --name=dep1 --version=1.0\")\n        client.run(\"export . --name=dep2 --version=1.0\")\n    \n        conanfile = GenConanfile().with_require(\"dep1/1.0\").with_require(\"dep2/1.0\")\n        client.save({\"conanfile.py\": conanfile}, clean_first=True)\n        client.run(\"create . --name=pkg --version=1.0\", assert_error=True)\n        self.assertIn(\"ERROR: Missing prebuilt package for 'dep1/1.0', 'dep2/1.0'\", client.out)\n>       self.assertIn(\"Try to build locally from sources using the '--build=dep1/1.0 --build=dep2/1.0'\", client.out)\nE       AssertionError: \"Try to build locally from sources using the '--build=dep1/1.0 --build=dep2/1.0'\" not found in \"\\n======== Exporting recipe to the cache ========\\npkg/1.0: Exporting package recipe: /private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/tmptrk386g8conans/path with spaces/conanfile.py\\npkg/1.0: Copied 1 '.py' file: conanfile.py\\npkg/1.0: Exported to cache folder: /private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/tmpn0zj0kr8conans/path with spaces/.conan2/p/pkg8e6ef68467395/e\\npkg/1.0: Exported: pkg/1.0#2bcfd5b64f1ae2a5635d8ff20befa7e2 (2026-07-25 23:00:08 UTC)\\n\\n======== Input profiles ========\\nProfile host:\\n[settings]\\narch=armv8\\nbuild_type=Release\\ncompiler=apple-clang\\ncompiler.libcxx=libc++\\ncompiler.version=13\\nos=Macos\\n\\nProfile build:\\n[settings]\\narch=armv8\\nbuild_type=Release\\ncompiler=apple-clang\\ncompiler.libcxx=libc++\\ncompiler.version=13\\nos=Macos\\n\\n\\n======== Computing dependency graph ========\\nGraph root\\n    cli\\nRequirements\\n    dep1/1.0#4d670581ccb765839f2239cc8dff8fbd - Cache\\n    dep2/1.0#4d670581ccb765839f2239cc8dff8fbd - Cache\\n    pkg/1.0#2bcfd5b64f1ae2a5635d8ff20befa7e2 - Cache\\n\\n======== Computing necessary packages ========\\npkg/1.0: Forced build from source\\nRequirements\\n    dep1/1.0#4d670581ccb765839f2239cc8dff8fbd:da39a3ee5e6b4b0d3255bfef95601890afd80709 - Missing\\n    dep2/1.0#4d670581ccb765839f2239cc8dff8fbd:da39a3ee5e6b4b0d3255bfef95601890afd80709 - Missing\\n    pkg/1.0#2bcfd5b64f1ae2a5635d8ff20befa7e2:61722815392888d2ffdfd7c8a46f93bfba356d09 - Build\\n\\n======== Installing packages ========\\nERROR: Missing binary: dep1/1.0:da39a3ee5e6b4b0d3255bfef95601890afd80709\\nERROR: Missing binary: dep2/1.0:da39a3ee5e6b4b0d3255bfef95601890afd80709\\n\\ndep1/1.0: WARN: Can't find a 'dep1/1.0' package binary 'da39a3ee5e6b4b0d3255bfef95601890afd80709' for the configuration:\\n\\nERROR: Missing prebuilt package for 'dep1/1.0', 'dep2/1.0'\\nCheck the available packages using 'conan list dep1/1.0:* -r=remote'\\nor try to build locally from sources using the '--build=dep1/1.0 --build=dep2/1.0' argument\\n\\nMore Info at 'https://docs.conan.io/2/knowledge/faq.html#error-missing-prebuilt-package'\\n\\n\"\n\nconans/test/integration/command/install/install_missing_dep_test.py:55: AssertionError\n=========================== short test summary info ============================\nFAILED conans/test/integration/command_v2/test_graph_find_binaries.py::TestFilterProfile::test_settings_exact_match_incomplete\nFAILED conans/test/integration/command_v2/test_graph_find_binaries.py::TestFilterProfile::test_settings_exact_match_complete\nFAILED conans/test/integration/command_v2/test_graph_find_binaries.py::TestFilterProfile::test_different_option\nFAILED conans/test/integration/command_v2/test_graph_find_binaries.py::TestFilterProfile::test_different_setting\nFAILED conans/test/integration/command_v2/test_graph_find_binaries.py::TestFilterProfile::test_different_platform\nFAILED conans/test/integration/command_v2/test_graph_find_binaries.py::TestMissingBinaryDeps::test_other_platform\nFAILED conans/test/integration/command_v2/test_graph_find_binaries.py::TestMissingBinaryDeps::test_other_dependencies\nFAILED conans/test/integration/command/install/install_missing_dep_test.py::InstallMissingDependency::test_missing_multiple_dep\n8 failed, 2 passed, 21 warnings in 1.44s\n"
+          }
+        },
+        "patch_sha256": {
+          "hidden_tests.patch": "c1bf4f286391ce02d83cd948ff5daa87a9676f137cc589c368b754f465591a1e",
+          "reference.patch": "eab7e270782978e1c3e60c8551245cab090da9dc56bdd11d4741fd45bea5bd90"
+        },
+        "problems": [],
+        "reference": {
+          "failure_modes": [],
+          "passed": true,
+          "task": "M_conan_graph_explain",
+          "tests": {
+            "command": [
+              "/REPO/.venv/bin/python",
+              "-m",
+              "pytest",
+              "-q",
+              "--disable-warnings",
+              "conans/test/integration/command_v2/test_graph_find_binaries.py",
+              "conans/test/functional/only_source_test.py::OnlySourceTest::test_build_policies_in_conanfile",
+              "conans/test/integration/command/install/install_missing_dep_test.py"
+            ],
+            "returncode": 0,
+            "seconds": 10.511,
+            "tail": "..........                                                               [100%]\n10 passed, 28 warnings in 5.77s\n"
+          }
+        },
+        "self_test_passed": true
+      },
+      "self_test_passed": true,
+      "started_at": "2026-07-25T22:59:50.747539Z",
+      "teardown_error": null,
+      "timed_out": false,
+      "workspace_error": null,
+      "workspace_ready": true
+    },
+    "N": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "/REPO/tasks/N_conan_platform_requires/verifier/verify.py",
+        "--self-test"
+      ],
+      "execution_error": null,
+      "finished_at": "2026-07-25T23:15:28.976364Z",
+      "log": "/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/preflight/N.log",
+      "log_bytes": 7866,
+      "log_cap_bytes": 67108864,
+      "log_overflow": false,
+      "parse_error": null,
+      "passed": true,
+      "process_passed": true,
+      "returncode": 0,
+      "seconds": 19.761,
+      "self_test": {
+        "baseline": {
+          "failure_modes": [
+            "hidden_or_regression_tests_failed"
+          ],
+          "passed": false,
+          "task": "N_conan_platform_requires",
+          "tests": {
+            "command": [
+              "/REPO/.venv/bin/python",
+              "-m",
+              "pytest",
+              "-q",
+              "--disable-warnings",
+              "conans/test/integration/graph/test_platform_requires.py",
+              "conans/test/integration/graph/test_system_tools.py",
+              "conans/test/integration/metadata/test_metadata_collect.py",
+              "conans/test/unittests/client/profile_loader/profile_loader_test.py"
+            ],
+            "returncode": 1,
+            "seconds": 3.427,
+            "tail": "clude(./profile0)\\n[platform_tool_requires]\\ntool1/1.1\")\n    \n        profile_loader = ProfileLoader(cache_folder=temp_folder())  # If not used cache, will not error\n>       profile2 = profile_loader.load_profile(\"./profile2\", tmp)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nconans/test/unittests/client/profile_loader/profile_loader_test.py:120: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nconans/client/profile_loader.py:104: in load_profile\n    profile = self._load_profile(profile_name, cwd)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <conans.client.profile_loader.ProfileLoader object at 0x10c33fca0>\nprofile_name = './profile2'\ncwd = '/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/tmpb68ks4cxconans/path with spaces'\n\n    def _load_profile(self, profile_name, cwd):\n        \"\"\" Will look for \"profile_name\" in disk if profile_name is absolute path,\n        in current folder if path is relative or in the default folder otherwise.\n        return: a Profile object\n        \"\"\"\n        profiles_folder = self._home_paths.profiles_path\n        profile_path = self.get_profile_path(profiles_folder, profile_name, cwd)\n        try:\n            text = load_user_encoded(profile_path)\n        except Exception as e:\n            raise ConanException(f\"Cannot load profile:\\n{e}\")\n    \n        # All profiles will be now rendered with jinja2 as first pass\n        base_path = os.path.dirname(profile_path)\n        file_path = os.path.basename(profile_path)\n        context = {\"platform\": platform,\n                   \"os\": os,\n                   \"profile_dir\": base_path,\n                   \"profile_name\": file_path,\n                   \"conan_version\": conan_version,\n                   \"detect_api\": detect_api}\n        rtemplate = Environment(loader=FileSystemLoader(base_path)).from_string(text)\n        text = rtemplate.render(context)\n    \n        try:\n            return self._recurse_load_profile(text, profile_path)\n        except ConanException as exc:\n>           raise ConanException(\"Error reading '%s' profile: %s\" % (profile_name, exc))\nE           conans.errors.ConanException: Error reading './profile2' profile: Error reading './profile0' profile: ConfigParser: Unrecognized field 'platform_tool_requires'\n\nconans/client/profile_loader.py:134: ConanException\n=========================== short test summary info ============================\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires_non_matching\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires_range\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires_range_non_matching\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires_no_host\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_graph_info_platform_requires_range\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_consumer_resolved_version\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_consumer_resolved_revision\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_consumer_unresolved_revision\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequiresLock::test_platform_requires_range\nFAILED conans/test/integration/graph/test_platform_requires.py::TestGenerators::test_platform_requires_range\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPackageID::test_package_id_modes[recipe_revision_mode]\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPackageID::test_package_id_modes[full_package_mode]\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPackageID::test_package_id_explicit_revision\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_non_matching\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_range_non_matching\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_no_host\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_graph_info_system_tool_require_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_consumer_resolved_version\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_consumer_resolved_revision\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_consumer_unresolved_revision\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequiresLock::test_system_tool_require_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestGenerators::test_system_tool_require_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestPackageID::test_package_id_modes[recipe_revision_mode]\nFAILED conans/test/integration/graph/test_system_tools.py::TestPackageID::test_package_id_modes[full_package_mode]\nFAILED conans/test/integration/graph/test_system_tools.py::TestPackageID::test_package_id_explicit_revision\nFAILED conans/test/integration/metadata/test_metadata_collect.py::test_custom_command_collect\nFAILED conans/test/unittests/client/profile_loader/profile_loader_test.py::test_profile_compose_platform_tool_requires\n30 failed, 11 passed, 10 warnings in 2.59s\n"
+          }
+        },
+        "patch_sha256": {
+          "hidden_tests.patch": "80171eb4dff4c1824e4c70b947f50111587a32915bb26dd9a938b859a531d7c6",
+          "reference.patch": "58bbcca1cabac313f700b003489c8f181f7aa5e68f39189a2234d148b2e497dc"
+        },
+        "problems": [],
+        "reference": {
+          "failure_modes": [],
+          "passed": true,
+          "task": "N_conan_platform_requires",
+          "tests": {
+            "command": [
+              "/REPO/.venv/bin/python",
+              "-m",
+              "pytest",
+              "-q",
+              "--disable-warnings",
+              "conans/test/integration/graph/test_platform_requires.py",
+              "conans/test/integration/graph/test_system_tools.py",
+              "conans/test/integration/metadata/test_metadata_collect.py",
+              "conans/test/unittests/client/profile_loader/profile_loader_test.py"
+            ],
+            "returncode": 0,
+            "seconds": 12.66,
+            "tail": ".........................................                                [100%]\n41 passed, 39 warnings in 11.81s\n"
+          }
+        },
+        "self_test_passed": true
+      },
+      "self_test_passed": true,
+      "started_at": "2026-07-25T23:00:15.572199Z",
+      "teardown_error": null,
+      "timed_out": false,
+      "workspace_error": null,
+      "workspace_ready": true
+    }
+  },
+  "tool_check_skipped": false
+}

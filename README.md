@@ -1,8 +1,45 @@
 # Frontier coding-agent starter task
 
 This repository contains the starter-task submission prepared by Long Duc Vu for
-Prof. Daniel Kang. It studies how to make a reproducible, mechanically graded claim
-that a frontier coding agent cannot complete a task under a fixed budget.
+Prof. Daniel Kang. It studies how to make a reproducible, mechanically graded
+measurement of where a frontier coding agent stops succeeding under a fixed
+budget — and how much such a measurement can honestly claim.
+
+## July 28 second-round update
+
+The current result is in [`STARTER_TASK_REPORT_V2.md`](STARTER_TASK_REPORT_V2.md).
+After the original A–I search below, a second search packaged two long-horizon
+Conan repository-evolution tasks:
+
+- **M — `conan graph explain`:** 0/5 passing artifacts from each agent in five
+  valid trials under the frozen 900-second configuration. Artifacts plateaued at
+  2–5 of 10 hidden tests; this is the clean discriminator.
+- **N — platform requirements:** 0/5 from each agent. Artifacts came close —
+  Fable 39/41 in each of its four final trials, Sol 38/41 at best — and the
+  residual failures sit on lockfile-ordering behavior the specification
+  underdetermines, so part of this gap is a specification gap. Four earlier
+  Fable attempts were invalid because the CLI account exhausted usage credits
+  and remain disclosed separately.
+
+Read that as **two tasks with 0/5 observed under one configuration**, not as a
+demonstration that either model cannot do them: five trials with zero passes
+bound the per-trial success rate below roughly 45%, and both tasks are survivors
+of an adaptive search that discarded every candidate an agent solved. The report
+also discloses two defects in the instrument itself (a grader tamper surface no
+counted trial exercised, and a Task M verifier narrower than its own spec). The
+email draft is [`EMAIL_TO_PROF_KANG_V2.md`](EMAIL_TO_PROF_KANG_V2.md), and the
+experiment chronology is [`RESEARCH_LOG_V2.md`](RESEARCH_LOG_V2.md).
+
+The two new checksum-sealed evidence bundles reproduce independently:
+
+```bash
+python harness/aggregate.py --run-dir evidence/runs/20260725T224349.182262Z-8b9db2d7
+python harness/aggregate.py --run-dir evidence/runs/20260726T034819.662937Z-ae330dd8
+python harness/aggregate.py --run-dir evidence/runs/20260728T062925.254874Z-d6ec0450
+```
+
+The remainder of this README describes the earlier A–I round and is retained as
+part of the full-disclosure record.
 
 **Headline result:** across seven tasks and a 70-trial run (Claude Fable via Claude Code vs GPT-5.6
 Sol via Codex, k=5, 900 s each, **all 70 trials valid**), **six of the seven were solved by both
@@ -79,7 +116,7 @@ it fail with `unexpected=['.DS_Store']`.
 ## Validate the harness and verifiers
 
 ```bash
-python -m pytest -q harness/tests        # 56 tests; 2 isolation tests skip
+python -m pytest -q harness/tests        # 60 tests; isolation tests skip
                                          # where macOS Seatbelt is unavailable
 
 for task in \

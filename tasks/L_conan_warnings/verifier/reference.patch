@@ -1,0 +1,485 @@
+diff --git a/conan/api/output.py b/conan/api/output.py
+index 179d983cb..ad8e541c3 100644
+--- a/conan/api/output.py
++++ b/conan/api/output.py
+@@ -51,6 +51,7 @@ class ConanOutput:
+     # Singleton
+     _conan_output_level = LEVEL_STATUS
+     _silent_warn_tags = []
++    _warnings_as_errors = False
+ 
+     def __init__(self, scope=""):
+         self.stream = sys.stderr
+@@ -63,6 +64,10 @@ class ConanOutput:
+     def define_silence_warnings(cls, warnings):
+         cls._silent_warn_tags = warnings or []
+ 
++    @classmethod
++    def set_warnings_as_errors(cls, value):
++        cls._warnings_as_errors = value
++
+     @classmethod
+     def define_log_level(cls, v):
+         """
+@@ -204,16 +209,27 @@ class ConanOutput:
+         return self
+ 
+     def warning(self, msg, warn_tag=None):
+-        if self._conan_output_level <= LEVEL_WARNING:
+-            if warn_tag is not None and warn_tag in self._silent_warn_tags:
++        def _skip_warning():
++            return (warn_tag is not None and warn_tag in self._silent_warn_tags
++                    or warn_tag is None and "unknown" in self._silent_warn_tags)
++        if self._conan_output_level <= LEVEL_WARNING or (self._warnings_as_errors and self._conan_output_level <= LEVEL_ERROR):
++            if _skip_warning():
+                 return self
+             warn_tag_msg = "" if warn_tag is None else f"{warn_tag}: "
+-            self._write_message(f"WARN: {warn_tag_msg}{msg}", Color.YELLOW)
++            output = f"{warn_tag_msg}{msg}"
++
++            if self._warnings_as_errors:
++                self.error(output)
++            else:
++                self._write_message(f"WARN: {output}", Color.YELLOW)
+         return self
+ 
+-    def error(self, msg):
++    def error(self, msg, error_type=None):
+         if self._conan_output_level <= LEVEL_ERROR:
+-            self._write_message("ERROR: {}".format(msg), Color.RED)
++            if self._warnings_as_errors and error_type != "exception":
++                raise ConanException(msg)
++            else:
++                self._write_message("ERROR: {}".format(msg), Color.RED)
+         return self
+ 
+     def flush(self):
+diff --git a/conan/cli/cli.py b/conan/cli/cli.py
+index 4961c2e4a..772dc4e03 100644
+--- a/conan/cli/cli.py
++++ b/conan/cli/cli.py
+@@ -58,8 +58,8 @@ class Cli:
+                 try:
+                     self._add_command(module_name, module_name.replace("cmd_", ""))
+                 except Exception as e:
+-                    ConanOutput().error("Error loading custom command "
+-                                        "'{}.py': {}".format(module_name, e))
++                    ConanOutput().error(f"Error loading custom command '{module_name}.py': {e}",
++                                        error_type="exception")
+         # layers
+         for folder in os.listdir(custom_commands_path):
+             layer_folder = os.path.join(custom_commands_path, folder)
+@@ -74,7 +74,8 @@ class Cli:
+                         self._add_command(module_path, module_name.replace("cmd_", ""),
+                                           package=folder)
+                     except Exception as e:
+-                        ConanOutput().error(f"Error loading custom command {module_path}: {e}")
++                        ConanOutput().error(f"Error loading custom command {module_path}: {e}",
++                                            error_type="exception")
+ 
+     def _add_command(self, import_path, method_name, package=None):
+         try:
+@@ -205,20 +206,20 @@ class Cli:
+         if exception is None:
+             return SUCCESS
+         if isinstance(exception, ConanInvalidConfiguration):
+-            output.error(exception)
++            output.error(exception, error_type="exception")
+             return ERROR_INVALID_CONFIGURATION
+         if isinstance(exception, ConanException):
+-            output.error(exception)
++            output.error(exception, error_type="exception")
+             return ERROR_GENERAL
+         if isinstance(exception, SystemExit):
+             if exception.code != 0:
+-                output.error("Exiting with code: %d" % exception.code)
++                output.error("Exiting with code: %d" % exception.code, error_type="exception")
+             return exception.code
+ 
+         assert isinstance(exception, Exception)
+-        output.error(traceback.format_exc())
++        output.error(traceback.format_exc(), error_type="exception")
+         msg = exception_message_safe(exception)
+-        output.error(msg)
++        output.error(msg, error_type="exception")
+         return ERROR_UNEXPECTED
+ 
+ 
+diff --git a/conan/internal/api/detect_api.py b/conan/internal/api/detect_api.py
+index 7ddfb4de1..0f6ad3963 100644
+--- a/conan/internal/api/detect_api.py
++++ b/conan/internal/api/detect_api.py
+@@ -205,6 +205,7 @@ def default_msvc_runtime(compiler):
+ def default_cppstd(compiler, compiler_version):
+     """ returns the default cppstd for the compiler-version. This is not detected, just the default
+     """
++
+     def _clang_cppstd_default(version):
+         if version >= "16":
+             return "gnu17"
+@@ -269,8 +270,8 @@ def detect_compiler():
+             return gcc, gcc_version
+         if platform.system() == "SunOS" and command.lower() == "cc":
+             return _sun_cc_compiler(command)
+-        if platform.system() == "Windows" and command.rstrip('"').endswith(("cl", "cl.exe")) \
+-                and "clang" not in command:
++        if (platform.system() == "Windows" and command.rstrip('"').endswith(("cl", "cl.exe"))
++            and "clang" not in command):
+             return _msvc_cl_compiler(command)
+ 
+         # I am not able to find its version
+diff --git a/conan/internal/cache/db/cache_database.py b/conan/internal/cache/db/cache_database.py
+index 6987066b5..fffa02486 100644
+--- a/conan/internal/cache/db/cache_database.py
++++ b/conan/internal/cache/db/cache_database.py
+@@ -13,7 +13,7 @@ class CacheDatabase:
+ 
+     def __init__(self, filename):
+         version = sqlite3.sqlite_version
+-        if Version(version) < "3.7.11":  # Not an exception, in case some false positives
++        if Version(version) < "3.7.11":
+             ConanOutput().error(f"Your sqlite3 '{version} < 3.7.11' version is not supported")
+         self._recipes = RecipesDBTable(filename)
+         self._packages = PackagesDBTable(filename)
+diff --git a/conan/internal/conan_app.py b/conan/internal/conan_app.py
+index b42e16a61..38f8cab84 100644
+--- a/conan/internal/conan_app.py
++++ b/conan/internal/conan_app.py
+@@ -38,14 +38,14 @@ class ConanFileHelpers:
+ 
+ class ConanApp(object):
+     def __init__(self, cache_folder, global_conf):
+-
++        self._configure(global_conf)
+         self.cache_folder = cache_folder
+         self.cache = ClientCache(self.cache_folder, global_conf)
+ 
+         home_paths = HomePaths(self.cache_folder)
+         self.hook_manager = HookManager(home_paths.hooks_path)
++
+         # Wraps an http_requester to inject proxies, certs, etc
+-        ConanOutput.define_silence_warnings(global_conf.get("core:skip_warnings", check_type=list))
+         self.requester = ConanRequester(global_conf, cache_folder)
+         # To handle remote connections
+         rest_client_factory = RestApiClientFactory(self.requester, global_conf)
+@@ -61,3 +61,9 @@ class ConanApp(object):
+         cmd_wrap = CmdWrapper(home_paths.wrapper_path)
+         conanfile_helpers = ConanFileHelpers(self.requester, cmd_wrap, global_conf, self.cache)
+         self.loader = ConanFileLoader(self.pyreq_loader, conanfile_helpers)
++
++    @staticmethod
++    def _configure(global_conf):
++        ConanOutput.set_warnings_as_errors(global_conf.get("core:warnings_as_errors",
++                                                           default=False, check_type=bool))
++        ConanOutput.define_silence_warnings(global_conf.get("core:skip_warnings", check_type=list))
+diff --git a/conan/internal/deploy.py b/conan/internal/deploy.py
+index 48d58c7f2..36ca53ef6 100644
+--- a/conan/internal/deploy.py
++++ b/conan/internal/deploy.py
+@@ -89,7 +89,7 @@ def _deploy_single(dep, conanfile, output_folder, folder_name):
+     except Exception as e:
+         if "WinError 1314" in str(e):
+             ConanOutput().error("full_deploy: Symlinks in Windows require admin privileges "
+-                                "or 'Developer mode = ON'")
++                                "or 'Developer mode = ON'", error_type="exception")
+         raise ConanException(f"full_deploy: The copy of '{dep}' files failed: {e}.\nYou can "
+                              f"use 'tools.deployer:symlinks' conf to disable symlinks")
+     dep.set_deploy_folder(new_folder)
+diff --git a/conan/internal/integrity_check.py b/conan/internal/integrity_check.py
+index b382d8aeb..fa52d5362 100644
+--- a/conan/internal/integrity_check.py
++++ b/conan/internal/integrity_check.py
+@@ -41,11 +41,11 @@ class IntegrityChecker:
+                                        if not k.startswith("export_source")}
+ 
+         if read_manifest != expected_manifest:
+-            output.error(f"{ref}: Manifest mismatch")
+-            output.error(f"Folder: {layout.export()}")
++            output.error(f"{ref}: Manifest mismatch", error_type="exception")
++            output.error(f"Folder: {layout.export()}", error_type="exception")
+             diff = read_manifest.difference(expected_manifest)
+             for fname, (h1, h2) in diff.items():
+-                output.error(f"    '{fname}' (manifest: {h1}, file: {h2})")
++                output.error(f"    '{fname}' (manifest: {h1}, file: {h2})", error_type="exception")
+             return True
+         output.info(f"{ref}: Integrity checked: ok")
+ 
+@@ -55,10 +55,10 @@ class IntegrityChecker:
+         read_manifest, expected_manifest = layout.package_manifests()
+ 
+         if read_manifest != expected_manifest:
+-            output.error(f"{ref}: Manifest mismatch")
+-            output.error(f"Folder: {layout.package()}")
++            output.error(f"{ref}: Manifest mismatch", error_type="exception")
++            output.error(f"Folder: {layout.package()}", error_type="exception")
+             diff = read_manifest.difference(expected_manifest)
+             for fname, (h1, h2) in diff.items():
+-                output.error(f"    '{fname}' (manifest: {h1}, file: {h2})")
++                output.error(f"    '{fname}' (manifest: {h1}, file: {h2})", error_type="exception")
+             return True
+         output.info(f"{ref}: Integrity checked: ok")
+diff --git a/conan/tools/files/files.py b/conan/tools/files/files.py
+index b4fda8847..a588e7094 100644
+--- a/conan/tools/files/files.py
++++ b/conan/tools/files/files.py
+@@ -339,7 +339,7 @@ def unzip(conanfile, filename, destination=".", keep_permissions=False, pattern=
+                 try:
+                     z.extract(file_, full_path)
+                 except Exception as e:
+-                    output.error("Error extract %s\n%s" % (file_.filename, str(e)))
++                    output.error(f"Error extract {file_.filename}\n{str(e)}", error_type="exception")
+         else:  # duplicated for, to avoid a platform check for each zipped file
+             for file_ in zip_info:
+                 extracted_size += file_.file_size
+@@ -352,7 +352,7 @@ def unzip(conanfile, filename, destination=".", keep_permissions=False, pattern=
+                         perm = file_.external_attr >> 16 & 0xFFF
+                         os.chmod(os.path.join(full_path, file_.filename), perm)
+                 except Exception as e:
+-                    output.error("Error extract %s\n%s" % (file_.filename, str(e)))
++                    output.error(f"Error extract {file_.filename}\n{str(e)}", error_type="exception")
+         output.writeln("")
+ 
+ 
+diff --git a/conans/client/cmd/export.py b/conans/client/cmd/export.py
+index 9bfe33013..660ab9246 100644
+--- a/conans/client/cmd/export.py
++++ b/conans/client/cmd/export.py
+@@ -78,7 +78,7 @@ def cmd_export(app, global_conf, conanfile_path, name, version, user, channel, g
+                 clean_dirty(source_folder)
+         except BaseException as e:
+             scoped_output.error("Unable to delete source folder. Will be marked as corrupted "
+-                                "for deletion")
++                                "for deletion", error_type="exception")
+             scoped_output.warning(str(e))
+             set_dirty(source_folder)
+ 
+diff --git a/conans/client/downloaders/file_downloader.py b/conans/client/downloaders/file_downloader.py
+index 2fbcf3529..2ff95a987 100644
+--- a/conans/client/downloaders/file_downloader.py
++++ b/conans/client/downloaders/file_downloader.py
+@@ -44,7 +44,7 @@ class FileDownloader:
+                     if counter == retry:
+                         raise
+                     else:
+-                        self._output.error(exc)
++                        self._output.warning(exc, warn_tag="network")
+                         self._output.info(f"Waiting {retry_wait} seconds to retry...")
+                         time.sleep(retry_wait)
+ 
+diff --git a/conans/client/generators/__init__.py b/conans/client/generators/__init__.py
+index 36d8b1997..c3f55c07b 100644
+--- a/conans/client/generators/__init__.py
++++ b/conans/client/generators/__init__.py
+@@ -95,7 +95,7 @@ def write_generators(conanfile, app):
+                     continue
+                 except Exception as e:
+                     # When a generator fails, it is very useful to have the whole stacktrace
+-                    conanfile.output.error(traceback.format_exc())
++                    conanfile.output.error(traceback.format_exc(), error_type="exception")
+                     raise ConanException(f"Error in generator '{generator_name}': {str(e)}") from e
+     finally:
+         # restore the generators attribute, so it can raise
+diff --git a/conans/client/graph/build_mode.py b/conans/client/graph/build_mode.py
+index 5ed470988..0e3b1e5ea 100644
+--- a/conans/client/graph/build_mode.py
++++ b/conans/client/graph/build_mode.py
+@@ -89,3 +89,7 @@ class BuildMode:
+         for pattern in self.build_missing_patterns:
+             if ref_matches(conanfile.ref, pattern, is_consumer=False):
+                 return True
++
++    def report_matches(self):
++        for pattern in self._unused_patterns:
++            ConanOutput().error(f"No package matching '{pattern}' pattern found.", error_type="context")
+diff --git a/conans/client/graph/install_graph.py b/conans/client/graph/install_graph.py
+index 9db92d812..ab39d8dc2 100644
+--- a/conans/client/graph/install_graph.py
++++ b/conans/client/graph/install_graph.py
+@@ -303,7 +303,7 @@ class InstallGraph:
+         missing_prefs_str = list(sorted([str(pref) for pref in missing_prefs]))
+         out = ConanOutput()
+         for pref_str in missing_prefs_str:
+-            out.error("Missing binary: %s" % pref_str)
++            out.error(f"Missing binary: {pref_str}", error_type="exception")
+         out.writeln("")
+ 
+         # Report details just the first one
+diff --git a/conans/client/installer.py b/conans/client/installer.py
+index 0aebc405c..5d0712e9b 100644
+--- a/conans/client/installer.py
++++ b/conans/client/installer.py
+@@ -97,7 +97,7 @@ class _PackageBuilder(object):
+             conanfile.output.success("Package '%s' built" % pref.package_id)
+             conanfile.output.info("Build folder %s" % conanfile.build_folder)
+         except Exception as exc:
+-            conanfile.output.error("\nPackage '%s' build failed" % pref.package_id)
++            conanfile.output.error(f"\nPackage '{pref.package_id}' build failed", error_type="exception")
+             conanfile.output.warning("Build folder %s" % conanfile.build_folder)
+             if isinstance(exc, ConanException):
+                 raise exc
+diff --git a/conans/client/migrations.py b/conans/client/migrations.py
+index c7213bdfa..08a2a9212 100644
+--- a/conans/client/migrations.py
++++ b/conans/client/migrations.py
+@@ -72,7 +72,8 @@ def _migrate_pkg_db_lru(cache_folder, old_version):
+                                f"INTEGER DEFAULT '{lru}' NOT NULL;")
+     except Exception:
+         ConanOutput().error(f"Could not complete the 2.0.14 DB migration."
+-                            " Please manually remove your .conan2 cache and reinstall packages")
++                            " Please manually remove your .conan2 cache and reinstall packages",
++                            error_type="exception")
+         raise
+     else:  # generate the back-migration script
+         undo_lru = textwrap.dedent("""\
+diff --git a/conans/client/remote_manager.py b/conans/client/remote_manager.py
+index 54287df4f..7a079046c 100644
+--- a/conans/client/remote_manager.py
++++ b/conans/client/remote_manager.py
+@@ -63,7 +63,7 @@ class RemoteManager(object):
+                                      f"no conanmanifest.txt")
+             self._signer.verify(ref, download_export, files=zipped_files)
+         except BaseException:  # So KeyboardInterrupt also cleans things
+-            ConanOutput(scope=str(ref)).error(f"Error downloading from remote '{remote.name}'")
++            ConanOutput(scope=str(ref)).error(f"Error downloading from remote '{remote.name}'", error_type="exception")
+             self._cache.remove_recipe_layout(layout)
+             raise
+         export_folder = layout.export()
+@@ -91,7 +91,7 @@ class RemoteManager(object):
+             self._call_remote(remote, "get_recipe", ref, download_export, metadata,
+                               only_metadata=True)
+         except BaseException:  # So KeyboardInterrupt also cleans things
+-            output.error(f"Error downloading metadata from remote '{remote.name}'")
++            output.error(f"Error downloading metadata from remote '{remote.name}'", error_type="exception")
+             raise
+ 
+     def get_recipe_sources(self, ref, layout, remote):
+@@ -134,8 +134,8 @@ class RemoteManager(object):
+             self._call_remote(remote, "get_package", pref, download_pkg_folder,
+                               metadata, only_metadata=True)
+         except BaseException as e:  # So KeyboardInterrupt also cleans things
+-            output.error("Exception while getting package metadata: %s" % str(pref.package_id))
+-            output.error("Exception: %s %s" % (type(e), str(e)))
++            output.error(f"Exception while getting package metadata: {str(pref.package_id)}", error_type="exception")
++            output.error(f"Exception: {type(e)} {str(e)}", error_type="exception")
+             raise
+ 
+     def _get_package(self, layout, pref, remote, scoped_output, metadata):
+@@ -166,8 +166,8 @@ class RemoteManager(object):
+             raise PackageNotFoundException(pref)
+         except BaseException as e:  # So KeyboardInterrupt also cleans things
+             self._cache.remove_package_layout(layout)
+-            scoped_output.error("Exception while getting package: %s" % str(pref.package_id))
+-            scoped_output.error("Exception: %s %s" % (type(e), str(e)))
++            scoped_output.error(f"Exception while getting package: {str(pref.package_id)}", error_type="exception")
++            scoped_output.error(f"Exception: {type(e)} {str(e)}", error_type="exception")
+             raise
+ 
+     def search_recipes(self, remote, pattern):
+diff --git a/conans/client/rest/auth_manager.py b/conans/client/rest/auth_manager.py
+index 84de9b03e..68680dfc4 100644
+--- a/conans/client/rest/auth_manager.py
++++ b/conans/client/rest/auth_manager.py
+@@ -78,9 +78,9 @@ class ConanApiAuthManager(object):
+             except AuthenticationException:
+                 out = ConanOutput()
+                 if user is None:
+-                    out.error('Wrong user or password')
++                    out.error('Wrong user or password', error_type="exception")
+                 else:
+-                    out.error('Wrong password for user "%s"' % user)
++                    out.error(f'Wrong password for user "{user}"', error_type="exception")
+                     out.info('You can change username with "conan remote login <remote> <username>"')
+             else:
+                 return self.call_rest_api_method(remote, method_name, *args, **kwargs)
+@@ -98,7 +98,7 @@ class ConanApiAuthManager(object):
+             self._localdb.store(user, token=None, refresh_token=None, remote_url=remote.url)
+         except Exception as e:
+             out = ConanOutput()
+-            out.error('Your credentials could not be stored in local cache\n')
++            out.error('Your credentials could not be stored in local cache\n', error_type="exception")
+             out.debug(str(e) + '\n')
+ 
+     @staticmethod
+diff --git a/conans/client/rest/file_uploader.py b/conans/client/rest/file_uploader.py
+index eab1819ed..bba570a91 100644
+--- a/conans/client/rest/file_uploader.py
++++ b/conans/client/rest/file_uploader.py
+@@ -76,7 +76,7 @@ class FileUploader(object):
+                     raise
+                 else:
+                     if self._output:
+-                        self._output.error(exc)
++                        self._output.warning(exc, warn_tag="network")
+                         self._output.info("Waiting %d seconds to retry..." % retry_wait)
+                     time.sleep(retry_wait)
+ 
+diff --git a/conans/client/rest/rest_client_v2.py b/conans/client/rest/rest_client_v2.py
+index 5922d0a8a..cc05c3038 100644
+--- a/conans/client/rest/rest_client_v2.py
++++ b/conans/client/rest/rest_client_v2.py
+@@ -147,7 +147,7 @@ class RestV2Methods(RestCommonMethods):
+             except (AuthenticationException, ForbiddenException):
+                 raise
+             except Exception as exc:
+-                output.error("\nError uploading file: %s, '%s'" % (filename, exc))
++                output.error(f"\nError uploading file: {filename}, '{exc}'", error_type="exception")
+                 failed.append(filename)
+ 
+         if failed:
+diff --git a/conans/client/userio.py b/conans/client/userio.py
+index f3a238529..33c9628ff 100644
+--- a/conans/client/userio.py
++++ b/conans/client/userio.py
+@@ -129,5 +129,5 @@ class UserInput(object):
+             elif s.lower() in ['no', 'n']:
+                 ret = False
+             else:
+-                self._out.error("%s is not a valid answer" % s)
++                self._out.error(f"{s} is not a valid answer")
+         return ret
+diff --git a/conans/migrations.py b/conans/migrations.py
+index 03560e65a..c455a0bb4 100644
+--- a/conans/migrations.py
++++ b/conans/migrations.py
+@@ -30,7 +30,7 @@ class Migrator(object):
+                 self._apply_back_migrations()
+                 self._update_version_file()
+         except Exception as e:
+-            ConanOutput().error(str(e))
++            ConanOutput().error(str(e), error_type="exception")
+             raise ConanMigrationError(e)
+ 
+     def _update_version_file(self):
+@@ -81,5 +81,6 @@ class Migrator(object):
+                 migrate_method(self.conf_path)
+             except Exception as e:
+                 ConanOutput().error(f"There was an error running downgrade migration: {e}. "
+-                                    f"Recommended to remove the cache and start from scratch")
++                                    f"Recommended to remove the cache and start from scratch",
++                                    error_type="exception")
+             os.remove(migration)
+diff --git a/conans/model/conf.py b/conans/model/conf.py
+index 4a46d91ec..7a295072f 100644
+--- a/conans/model/conf.py
++++ b/conans/model/conf.py
+@@ -12,6 +12,7 @@ from conans.model.recipe_ref import ref_matches
+ BUILT_IN_CONFS = {
+     "core:required_conan_version": "Raise if current version does not match the defined range.",
+     "core:non_interactive": "Disable interactive user input, raises error if input necessary",
++    "core:warnings_as_errors": "Treat warnings as errors",
+     "core:skip_warnings": "Do not show warnings in this list",
+     "core:default_profile": "Defines the default host profile ('default' by default)",
+     "core:default_build_profile": "Defines the default build profile ('default' by default)",
+diff --git a/conans/model/graph_lock.py b/conans/model/graph_lock.py
+index 789bb0818..f58c940b0 100644
+--- a/conans/model/graph_lock.py
++++ b/conans/model/graph_lock.py
+@@ -224,7 +224,7 @@ class Lockfile(object):
+                 msg = f"Override defined for {require.ref}, but multiple possible overrides" \
+                       f" {overrides}. You might need to apply the 'conan graph build-order'" \
+                       f" overrides for correctly building this package with this lockfile"
+-                ConanOutput().error(msg)
++                ConanOutput().error(msg, error_type="exception")
+             raise
+ 
+     def _resolve_overrides(self, require):

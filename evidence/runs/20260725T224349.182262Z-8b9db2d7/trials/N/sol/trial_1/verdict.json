@@ -1,0 +1,140 @@
+{
+  "agent_run": {
+    "command": [
+      "/usr/bin/sandbox-exec",
+      "-p",
+      "(version 1)\n(allow default)\n(deny file-read* file-write* (subpath \"/HOME/Documents/Long_VD_Infor/l_application\"))\n(deny file-write* (subpath \"/private/tmp\") (subpath \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T\"))\n(allow file-read-metadata (literal \"/HOME/Documents/Long_VD_Infor/l_application\") (literal \"/REPO\") (literal \"/REPO/.venv\") (literal \"/REPO/results\") (literal \"/REPO/results/runs\") (literal \"/REPO/results/runs/20260725T224349.182262Z-8b9db2d7\") (literal \"/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials\") (literal \"/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N\") (literal \"/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N/sol\") (literal \"/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N/sol/trial_1\") (literal \"/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N/sol/trial_1/agent-private\") (literal \"/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N/sol/trial_1/sandbox\"))\n(allow file-read* (literal \"/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N/sol/trial_1/sandbox\"))\n(allow file-read* file-write* (subpath \"/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N/sol/trial_1/sandbox\"))\n(allow file-read* (literal \"/REPO/.venv\"))\n(allow file-read* (subpath \"/REPO/.venv\"))\n(allow file-read* file-write* (literal \"/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N/sol/trial_1/agent-private\"))\n(allow file-read* file-write* (subpath \"/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N/sol/trial_1/agent-private\"))\n(allow file-write* (literal \"/private/tmp\"))\n(allow file-read* file-write* (literal \"/private/tmp/claude-501\"))\n(allow file-read* file-write* (subpath \"/private/tmp/claude-501\"))\n(allow file-write* (literal \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T\"))\n(allow file-read* file-write* (literal \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/claude-501\"))\n(allow file-read* file-write* (subpath \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/claude-501\"))",
+      "codex",
+      "exec",
+      "You are an autonomous coding agent working in the current working directory, which contains a self-contained coding task. Read README.md and SPEC.md first, then complete the task by creating/editing files in this directory. Follow every rule stated in README.md exactly. Verify your own work as best you can. Do not ask questions and do not stop early \u2014 produce the complete deliverable, then finish.",
+      "-C",
+      "/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N/sol/trial_1/sandbox",
+      "-s",
+      "danger-full-access",
+      "--skip-git-repo-check",
+      "-m",
+      "gpt-5.6-sol",
+      "-c",
+      "model_reasoning_effort=\"high\""
+    ],
+    "execution_error": null,
+    "finished_at": "2026-07-26T00:09:48.567405Z",
+    "isolation": {
+      "available": true,
+      "backend": "darwin-seatbelt",
+      "capabilities": {
+        "agent_shared_temp_write_isolated": false,
+        "benchmark_secrets_isolated": null,
+        "candidate_isolated": null,
+        "candidate_network_isolated": null,
+        "candidate_private_temp_isolated": null,
+        "candidate_protocol_fd_isolated": null,
+        "candidate_submission_read_only": null,
+        "host_filesystem_isolated": false,
+        "sibling_trials_isolated": null,
+        "trial_write_isolated": false
+      },
+      "error": null,
+      "evidence": {
+        "dynamic_probe": [],
+        "unit_tested": [
+          "candidate_protocol_fd_isolated",
+          "candidate_process_group_cleanup",
+          "candidate_output_bounded"
+        ]
+      },
+      "requested": "strict",
+      "warning": "Benchmark-scoped isolation only: hidden verifier/oracle/reference and sibling trials are isolated, but authenticated agent CLIs retain host home/config access; whole-host filesystem and total write isolation are not claimed."
+    },
+    "log": "/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N/sol/trial_1/agent.log",
+    "log_bytes": 1463967,
+    "log_cap_bytes": 67108864,
+    "log_overflow": false,
+    "returncode": -15,
+    "runtime_scratch_cleanup_error": null,
+    "runtime_scratch_removed": true,
+    "seconds": 900.04,
+    "started_at": "2026-07-25T23:54:48.561128Z",
+    "teardown_error": null,
+    "timed_out": true
+  },
+  "record": {
+    "agent": "sol",
+    "agent_completed": false,
+    "artifact_passed_verifier": false,
+    "failure_modes": [
+      "hidden_or_regression_tests_failed"
+    ],
+    "infra_error": false,
+    "passed": false,
+    "primary_success": false,
+    "returncode": -15,
+    "seconds": 900.04,
+    "status_reason": [
+      "agent_timeout",
+      "artifact_failed_verifier"
+    ],
+    "task": "N",
+    "timed_out": true,
+    "trial": 1,
+    "trial_valid": true,
+    "verifier_completed": true
+  },
+  "schema_version": 2,
+  "status": {
+    "agent_completed": false,
+    "artifact_passed_verifier": false,
+    "infra_error": false,
+    "primary_success": false,
+    "status_reason": [
+      "agent_timeout",
+      "artifact_failed_verifier"
+    ],
+    "trial_valid": true,
+    "verifier_completed": true
+  },
+  "verdict": {
+    "failure_modes": [
+      "hidden_or_regression_tests_failed"
+    ],
+    "passed": false,
+    "task": "N_conan_platform_requires",
+    "tests": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--disable-warnings",
+        "conans/test/integration/graph/test_platform_requires.py",
+        "conans/test/integration/graph/test_system_tools.py",
+        "conans/test/integration/metadata/test_metadata_collect.py",
+        "conans/test/unittests/client/profile_loader/profile_loader_test.py"
+      ],
+      "returncode": 1,
+      "seconds": 6.315,
+      "tail": "l_requires]\\ntool/1.1#rev1\"})\n        client.run(\"install . -pr=profile\")\n>       assert \"tool/1.1 - Platform\" in client.out\nE       assert 'tool/1.1 - Platform' in \"\\n======== Input profiles ========\\nProfile host:\\n[settings]\\n[platform_tool_requires]\\ntool/1.1#rev1\\n\\nProfile bui...files\\nconanfile.py: Generated aggregated env files: ['conanbuild.sh', 'conanrun.sh']\\nInstall finished successfully\\n\"\nE        +  where \"\\n======== Input profiles ========\\nProfile host:\\n[settings]\\n[platform_tool_requires]\\ntool/1.1#rev1\\n\\nProfile bui...files\\nconanfile.py: Generated aggregated env files: ['conanbuild.sh', 'conanrun.sh']\\nInstall finished successfully\\n\" = <conans.test.utils.tools.TestClient object at 0x10a8f2210>.out\n\nconans/test/integration/graph/test_system_tools.py:103: AssertionError\n_____________ TestToolRequiresLock.test_system_tool_require_range ______________\n\nself = <conans.test.integration.graph.test_system_tools.TestToolRequiresLock object at 0x10a731450>\n\n    def test_system_tool_require_range(self):\n        c = TestClient()\n        c.save({\"conanfile.py\": GenConanfile(\"pkg\", \"1.0\").with_tool_requires(\"tool/[>=1.0]\"),\n                \"profile\": \"[platform_tool_requires]\\ntool/1.1\"})\n        c.run(\"lock create . -pr=profile\")\n        assert \"tool/1.1 - Platform\" in c.out\n        lock = json.loads(c.load(\"conan.lock\"))\n        assert lock[\"build_requires\"] == [\"tool/1.1\"]\n    \n        c.run(\"install .\", assert_error=True)\n        assert \"Package 'tool/1.1' not resolved: No remote defined\" in c.out\n        c.run(\"install . -pr=profile\")\n        assert \"tool/1.1 - Platform\" in c.out\n    \n        # even if we create a version within the range, it will error if not matching the profile\n        c.save({\"tool/conanfile.py\": GenConanfile(\"tool\", \"1.1\")})\n        c.run(\"create tool\")\n        # if the profile points to another version it is an error, not in the lockfile\n        c.save({\"profile\": \"[platform_tool_requires]\\ntool/1.2\"})\n>       c.run(\"install . -pr=profile\", assert_error=True)\n\nconans/test/integration/graph/test_system_tools.py:161: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nconans/test/utils/tools.py:559: in run\n    return self._run_cli(command_line, assert_error=assert_error)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nconans/test/utils/tools.py:533: in _run_cli\n    self._handle_cli_result(command_line, assert_error=assert_error, error=error, trace=trace)\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <conans.test.utils.tools.TestClient object at 0x10a9b7a70>\ncommand = 'install . -pr=profile', assert_error = True, error = 0, trace = None\n\n    def _handle_cli_result(self, command, assert_error, error, trace=None):\n        if (assert_error and not error) or (not assert_error and error):\n            if assert_error:\n                msg = \" Command succeeded (failure expected): \"\n            else:\n                msg = \" Command failed (unexpectedly): \"\n            exc_message = \"\\n{header}\\n{cmd}\\n{output_header}\\n{output}\\n\".format(\n                header='{:=^80}'.format(msg),\n                output_header='{:=^80}'.format(\" Output: \"),\n                cmd=command,\n                output=str(self.stderr) + str(self.stdout) + \"\\n\" + str(self.out)\n            )\n            if trace:\n                exc_message += '{:=^80}'.format(\" Traceback: \") + f\"\\n{trace}\"\n>           raise Exception(exc_message)\nE           Exception: \nE           ==================== Command succeeded (failure expected): =====================\nE           install . -pr=profile\nE           =================================== Output: ====================================\nE           Using lockfile: '/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/tmpm9rce34jconans/path with spaces/conan.lock'\nE           \nE           ======== Input profiles ========\nE           Profile host:\nE           [settings]\nE           [platform_tool_requires]\nE           tool/1.2\nE           \nE           Profile build:\nE           [settings]\nE           arch=armv8\nE           build_type=Release\nE           compiler=apple-clang\nE           compiler.libcxx=libc++\nE           compiler.version=13\nE           os=Macos\nE           \nE           \nE           ======== Computing dependency graph ========\nE           Graph root\nE               conanfile.py (pkg/1.0): /private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/tmpm9rce34jconans/path with spaces/conanfile.py\nE           Build requirements\nE               tool/1.1#888bda2348dd2ddcf5960d0af63b08f7 - Cache\nE           \nE           ======== Computing necessary packages ========\nE           Build requirements\nE               tool/1.1#888bda2348dd2ddcf5960d0af63b08f7:da39a3ee5e6b4b0d3255bfef95601890afd80709#0ba8627bd47edc3a501e8f0eb9a79e5e - Cache\nE           \nE           ======== Installing packages ========\nE           tool/1.1: Already installed! (1 of 1)\nE           \nE           ======== Finalizing install (deploy, generators) ========\nE           conanfile.py (pkg/1.0): Generating aggregated env files\nE           conanfile.py (pkg/1.0): Generated aggregated env files: ['conanbuild.sh', 'conanrun.sh']\nE           Install finished successfully\n\nconans/test/utils/tools.py:600: Exception\n=========================== short test summary info ============================\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_consumer_resolved_revision\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequiresLock::test_platform_requires_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_non_matching\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_consumer_resolved_revision\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequiresLock::test_system_tool_require_range\n5 failed, 36 passed, 39 warnings in 5.55s\n"
+    }
+  },
+  "verifier_run": {
+    "command": [
+      "/REPO/.venv/bin/python",
+      "/REPO/tasks/N_conan_platform_requires/verifier/verify.py",
+      "--submission",
+      "/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N/sol/trial_1/sandbox"
+    ],
+    "completed": true,
+    "error": null,
+    "execution_error": null,
+    "finished_at": "2026-07-26T00:10:06.540885Z",
+    "log": "/REPO/results/runs/20260725T224349.182262Z-8b9db2d7/trials/N/sol/trial_1/verifier.log",
+    "log_bytes": 6860,
+    "log_cap_bytes": 67108864,
+    "log_overflow": false,
+    "returncode": 0,
+    "seconds": 12.811,
+    "started_at": "2026-07-26T00:09:53.729358Z",
+    "teardown_error": null,
+    "timed_out": false
+  }
+}

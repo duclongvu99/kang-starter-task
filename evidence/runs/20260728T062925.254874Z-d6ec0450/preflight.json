@@ -1,0 +1,139 @@
+{
+  "agents": {
+    "fable": {
+      "error": null,
+      "executable": "claude",
+      "passed": true,
+      "path": "/HOME/.local/bin/claude",
+      "tool_check": {
+        "agent": "fable",
+        "agent_run": {
+          "execution_error": null,
+          "returncode": 0,
+          "seconds": 43.829,
+          "teardown_error": null,
+          "timed_out": false
+        },
+        "error": null,
+        "observed": "TOOLCHECK_OK",
+        "passed": true
+      },
+      "version": "2.1.220 (Claude Code)",
+      "version_returncode": 0
+    }
+  },
+  "isolation": {
+    "available": true,
+    "backend": "darwin-seatbelt",
+    "capabilities": {
+      "agent_shared_temp_write_isolated": false,
+      "benchmark_secrets_isolated": true,
+      "candidate_isolated": true,
+      "candidate_network_isolated": true,
+      "candidate_private_temp_isolated": true,
+      "candidate_protocol_fd_isolated": null,
+      "candidate_submission_read_only": true,
+      "host_filesystem_isolated": false,
+      "sibling_trials_isolated": true,
+      "trial_write_isolated": false
+    },
+    "error": null,
+    "evidence": {
+      "dynamic_probe": [
+        "benchmark_secrets_isolated",
+        "sibling_trials_isolated",
+        "candidate_isolated",
+        "candidate_network_isolated",
+        "candidate_submission_read_only",
+        "candidate_private_temp_isolated"
+      ],
+      "unit_tested": [
+        "candidate_protocol_fd_isolated",
+        "candidate_process_group_cleanup",
+        "candidate_output_bounded"
+      ]
+    },
+    "requested": "strict",
+    "warning": "Benchmark-scoped isolation only: hidden verifier/oracle/reference and sibling trials are isolated, but authenticated agent CLIs retain host home/config access; whole-host filesystem and total write isolation are not claimed."
+  },
+  "passed": true,
+  "tasks": {
+    "N": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "/REPO/tasks/N_conan_platform_requires/verifier/verify.py",
+        "--self-test"
+      ],
+      "execution_error": null,
+      "finished_at": "2026-07-28T06:31:42.085210Z",
+      "log": "/REPO/results/runs/20260728T062925.254874Z-d6ec0450/preflight/N.log",
+      "log_bytes": 7868,
+      "log_cap_bytes": 67108864,
+      "log_overflow": false,
+      "parse_error": null,
+      "passed": true,
+      "process_passed": true,
+      "returncode": 0,
+      "seconds": 44.785,
+      "self_test": {
+        "baseline": {
+          "failure_modes": [
+            "hidden_or_regression_tests_failed"
+          ],
+          "passed": false,
+          "task": "N_conan_platform_requires",
+          "tests": {
+            "command": [
+              "/REPO/.venv/bin/python",
+              "-m",
+              "pytest",
+              "-q",
+              "--disable-warnings",
+              "conans/test/integration/graph/test_platform_requires.py",
+              "conans/test/integration/graph/test_system_tools.py",
+              "conans/test/integration/metadata/test_metadata_collect.py",
+              "conans/test/unittests/client/profile_loader/profile_loader_test.py"
+            ],
+            "returncode": 1,
+            "seconds": 11.303,
+            "tail": "clude(./profile0)\\n[platform_tool_requires]\\ntool1/1.1\")\n    \n        profile_loader = ProfileLoader(cache_folder=temp_folder())  # If not used cache, will not error\n>       profile2 = profile_loader.load_profile(\"./profile2\", tmp)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nconans/test/unittests/client/profile_loader/profile_loader_test.py:120: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nconans/client/profile_loader.py:104: in load_profile\n    profile = self._load_profile(profile_name, cwd)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <conans.client.profile_loader.ProfileLoader object at 0x10a30fca0>\nprofile_name = './profile2'\ncwd = '/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/tmpwkt3xoq_conans/path with spaces'\n\n    def _load_profile(self, profile_name, cwd):\n        \"\"\" Will look for \"profile_name\" in disk if profile_name is absolute path,\n        in current folder if path is relative or in the default folder otherwise.\n        return: a Profile object\n        \"\"\"\n        profiles_folder = self._home_paths.profiles_path\n        profile_path = self.get_profile_path(profiles_folder, profile_name, cwd)\n        try:\n            text = load_user_encoded(profile_path)\n        except Exception as e:\n            raise ConanException(f\"Cannot load profile:\\n{e}\")\n    \n        # All profiles will be now rendered with jinja2 as first pass\n        base_path = os.path.dirname(profile_path)\n        file_path = os.path.basename(profile_path)\n        context = {\"platform\": platform,\n                   \"os\": os,\n                   \"profile_dir\": base_path,\n                   \"profile_name\": file_path,\n                   \"conan_version\": conan_version,\n                   \"detect_api\": detect_api}\n        rtemplate = Environment(loader=FileSystemLoader(base_path)).from_string(text)\n        text = rtemplate.render(context)\n    \n        try:\n            return self._recurse_load_profile(text, profile_path)\n        except ConanException as exc:\n>           raise ConanException(\"Error reading '%s' profile: %s\" % (profile_name, exc))\nE           conans.errors.ConanException: Error reading './profile2' profile: Error reading './profile0' profile: ConfigParser: Unrecognized field 'platform_tool_requires'\n\nconans/client/profile_loader.py:134: ConanException\n=========================== short test summary info ============================\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires_non_matching\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires_range\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires_range_non_matching\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires_no_host\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_graph_info_platform_requires_range\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_consumer_resolved_version\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_consumer_resolved_revision\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_consumer_unresolved_revision\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequiresLock::test_platform_requires_range\nFAILED conans/test/integration/graph/test_platform_requires.py::TestGenerators::test_platform_requires_range\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPackageID::test_package_id_modes[recipe_revision_mode]\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPackageID::test_package_id_modes[full_package_mode]\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPackageID::test_package_id_explicit_revision\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_non_matching\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_range_non_matching\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_no_host\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_graph_info_system_tool_require_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_consumer_resolved_version\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_consumer_resolved_revision\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_consumer_unresolved_revision\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequiresLock::test_system_tool_require_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestGenerators::test_system_tool_require_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestPackageID::test_package_id_modes[recipe_revision_mode]\nFAILED conans/test/integration/graph/test_system_tools.py::TestPackageID::test_package_id_modes[full_package_mode]\nFAILED conans/test/integration/graph/test_system_tools.py::TestPackageID::test_package_id_explicit_revision\nFAILED conans/test/integration/metadata/test_metadata_collect.py::test_custom_command_collect\nFAILED conans/test/unittests/client/profile_loader/profile_loader_test.py::test_profile_compose_platform_tool_requires\n30 failed, 11 passed, 10 warnings in 8.52s\n"
+          }
+        },
+        "patch_sha256": {
+          "hidden_tests.patch": "80171eb4dff4c1824e4c70b947f50111587a32915bb26dd9a938b859a531d7c6",
+          "reference.patch": "58bbcca1cabac313f700b003489c8f181f7aa5e68f39189a2234d148b2e497dc"
+        },
+        "problems": [],
+        "reference": {
+          "failure_modes": [],
+          "passed": true,
+          "task": "N_conan_platform_requires",
+          "tests": {
+            "command": [
+              "/REPO/.venv/bin/python",
+              "-m",
+              "pytest",
+              "-q",
+              "--disable-warnings",
+              "conans/test/integration/graph/test_platform_requires.py",
+              "conans/test/integration/graph/test_system_tools.py",
+              "conans/test/integration/metadata/test_metadata_collect.py",
+              "conans/test/unittests/client/profile_loader/profile_loader_test.py"
+            ],
+            "returncode": 0,
+            "seconds": 21.925,
+            "tail": ".........................................                                [100%]\n41 passed, 39 warnings in 15.98s\n"
+          }
+        },
+        "self_test_passed": true
+      },
+      "self_test_passed": true,
+      "started_at": "2026-07-28T06:30:57.299863Z",
+      "teardown_error": null,
+      "timed_out": false,
+      "workspace_error": null,
+      "workspace_ready": true
+    }
+  },
+  "tool_check_skipped": false
+}

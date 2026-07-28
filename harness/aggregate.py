@@ -24,9 +24,11 @@ TASK_LABEL = {
 
 
 def _hash_file(path: Path) -> str:
-    if path.is_symlink():
-        raise ValueError(f"symlink forbidden in run evidence: {path}")
     digest = hashlib.sha256()
+    if path.is_symlink():
+        digest.update(b"symlink\0")
+        digest.update(os.fsencode(os.readlink(path)))
+        return digest.hexdigest()
     with path.open("rb") as stream:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
@@ -39,15 +41,14 @@ def _evidence_files(run_dir: Path) -> list[Path]:
     files: list[Path] = []
     for current, directories, filenames in os.walk(run_dir, followlinks=False):
         current_path = Path(current)
-        for name in directories:
+        for name in list(directories):
             path = current_path / name
             if path.is_symlink():
-                raise ValueError(f"symlink directory forbidden in run evidence: {path}")
+                files.append(path)
+                directories.remove(name)
         for name in filenames:
             path = current_path / name
-            if path.is_symlink():
-                raise ValueError(f"symlink file forbidden in run evidence: {path}")
-            if not path.is_file():
+            if not path.is_symlink() and not path.is_file():
                 raise ValueError(f"non-regular file forbidden in run evidence: {path}")
             files.append(path)
     return sorted(files)

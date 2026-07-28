@@ -1,0 +1,405 @@
+{
+  "summary": {
+    "M": {
+      "fable": {
+        "artifact_passes": 0,
+        "avg_agent_seconds": 901.042,
+        "failure_modes": {
+          "hidden_or_regression_tests_failed": 4
+        },
+        "infra_errors": 0,
+        "success_rate": 0.0,
+        "successes": 0,
+        "total_trials": 4,
+        "valid_attempts": 4
+      },
+      "sol": {
+        "artifact_passes": 0,
+        "avg_agent_seconds": 784.71,
+        "failure_modes": {
+          "hidden_or_regression_tests_failed": 4
+        },
+        "infra_errors": 0,
+        "success_rate": 0.0,
+        "successes": 0,
+        "total_trials": 4,
+        "valid_attempts": 4
+      }
+    },
+    "N": {
+      "fable": {
+        "artifact_passes": 0,
+        "avg_agent_seconds": 126.025,
+        "failure_modes": {
+          "hidden_or_regression_tests_failed": 4
+        },
+        "infra_errors": 4,
+        "success_rate": null,
+        "successes": 0,
+        "total_trials": 4,
+        "valid_attempts": 0
+      },
+      "sol": {
+        "artifact_passes": 0,
+        "avg_agent_seconds": 835.925,
+        "failure_modes": {
+          "hidden_or_regression_tests_failed": 4
+        },
+        "infra_errors": 0,
+        "success_rate": 0.0,
+        "successes": 0,
+        "total_trials": 4,
+        "valid_attempts": 4
+      }
+    }
+  },
+  "trials": [
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -9,
+      "seconds": 901.039,
+      "status_reason": [
+        "agent_timeout",
+        "artifact_failed_verifier"
+      ],
+      "task": "M",
+      "timed_out": true,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -9,
+      "seconds": 901.037,
+      "status_reason": [
+        "agent_timeout",
+        "artifact_failed_verifier"
+      ],
+      "task": "M",
+      "timed_out": true,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -9,
+      "seconds": 901.044,
+      "status_reason": [
+        "agent_timeout",
+        "artifact_failed_verifier"
+      ],
+      "task": "M",
+      "timed_out": true,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -9,
+      "seconds": 901.047,
+      "status_reason": [
+        "agent_timeout",
+        "artifact_failed_verifier"
+      ],
+      "task": "M",
+      "timed_out": true,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 0,
+      "seconds": 836.634,
+      "status_reason": [
+        "artifact_failed_verifier"
+      ],
+      "task": "M",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 0,
+      "seconds": 711.924,
+      "status_reason": [
+        "artifact_failed_verifier"
+      ],
+      "task": "M",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 0,
+      "seconds": 690.252,
+      "status_reason": [
+        "artifact_failed_verifier"
+      ],
+      "task": "M",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -15,
+      "seconds": 900.03,
+      "status_reason": [
+        "agent_timeout",
+        "artifact_failed_verifier"
+      ],
+      "task": "M",
+      "timed_out": true,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": true,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 1,
+      "seconds": 412.618,
+      "status_reason": [
+        "agent_nonzero_exit",
+        "artifact_failed_verifier"
+      ],
+      "task": "N",
+      "timed_out": false,
+      "trial": 1,
+      "trial_valid": false,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": true,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 1,
+      "seconds": 84.375,
+      "status_reason": [
+        "agent_nonzero_exit",
+        "artifact_failed_verifier"
+      ],
+      "task": "N",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": false,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": true,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 1,
+      "seconds": 3.551,
+      "status_reason": [
+        "agent_nonzero_exit",
+        "artifact_failed_verifier"
+      ],
+      "task": "N",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": false,
+      "verifier_completed": true
+    },
+    {
+      "agent": "fable",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": true,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 1,
+      "seconds": 3.554,
+      "status_reason": [
+        "agent_nonzero_exit",
+        "artifact_failed_verifier"
+      ],
+      "task": "N",
+      "timed_out": false,
+      "trial": 4,
+      "trial_valid": false,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -15,
+      "seconds": 900.03,
+      "status_reason": [
+        "agent_timeout",
+        "artifact_failed_verifier"
+      ],
+      "task": "N",
+      "timed_out": true,
+      "trial": 1,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 0,
+      "seconds": 894.163,
+      "status_reason": [
+        "artifact_failed_verifier"
+      ],
+      "task": "N",
+      "timed_out": false,
+      "trial": 2,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": true,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": 0,
+      "seconds": 649.47,
+      "status_reason": [
+        "artifact_failed_verifier"
+      ],
+      "task": "N",
+      "timed_out": false,
+      "trial": 3,
+      "trial_valid": true,
+      "verifier_completed": true
+    },
+    {
+      "agent": "sol",
+      "agent_completed": false,
+      "artifact_passed_verifier": false,
+      "failure_modes": [
+        "hidden_or_regression_tests_failed"
+      ],
+      "infra_error": false,
+      "passed": false,
+      "primary_success": false,
+      "returncode": -15,
+      "seconds": 900.036,
+      "status_reason": [
+        "agent_timeout",
+        "artifact_failed_verifier"
+      ],
+      "task": "N",
+      "timed_out": true,
+      "trial": 4,
+      "trial_valid": true,
+      "verifier_completed": true
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "manifest.json": "65e7752f13adf080910b7979484ce4c52ba2eaa74d428b486f126f689620f2f4",
+    "preflight.json": "c4f64e3340e1ae103b55e65d5ffff3cdb388ddcdc72853f6eb676069cf4bd693",
+    "summary.json": "48d5aca6f12fe1cfe1d3ad5a9f4804178a86e062e0b1a820441ce4da0bd63c9d",
+    "trials/M/fable/trial_1/verdict.json": "539e1b1f04cf90be19e06de50c70d498a1a5b54cd7c807f3919f748778dc24e7",
+    "trials/M/fable/trial_2/verdict.json": "10141bb0912073bb8cd0e9938d72542eff433288d733ce5d336cc209126077e0",
+    "trials/M/fable/trial_3/verdict.json": "e9345502d4b4ad18845c08469749303d1e292007d6503b7b092e086d2a47838e",
+    "trials/M/fable/trial_4/verdict.json": "b0397dcb1b7814c35a93468cac5572e6cd2cced6c1997499dc38da6a20531653",
+    "trials/M/sol/trial_1/verdict.json": "78256a04a4adfcf80a561655499d0cb65037590ba31e4b50ee716b4962465e09",
+    "trials/M/sol/trial_2/verdict.json": "c4ed753cd8a6678296c85560eacc9a7fdd6d1e466be65784d234563c478f66b5",
+    "trials/M/sol/trial_3/verdict.json": "5fa829f2a297a95844db77d9cd5ef0f89718e2206b378e66e4a0cb40d79f5bc3",
+    "trials/M/sol/trial_4/verdict.json": "0446305be19f22ed9ec4a8d99013ba0fec3212e6ef42c5acac0950b540807e19",
+    "trials/N/fable/trial_1/verdict.json": "8b1bbcead910673770e2a034ca3d442df60abdb3520e6e85f7ea4cbec11c22d3",
+    "trials/N/fable/trial_2/verdict.json": "278802570b567b58c6b2e09d868c862e68ac6cf8e3563e60b671d3bf926662c6",
+    "trials/N/fable/trial_3/verdict.json": "49bf4e765c9c7f76a7b6a56ec5f7ed91554ba8909adf2db7c7ebbd28bf9f7d15",
+    "trials/N/fable/trial_4/verdict.json": "7a9f996200306ed709bf5b84959a461b1ccd0e0db5d22440cf0e2640953701c1",
+    "trials/N/sol/trial_1/verdict.json": "ee42e1bc5d0b9273c4fccbe1555edf3f1c6ef8dd76b53a9b71e0101fbcd4f902",
+    "trials/N/sol/trial_2/verdict.json": "7cf87d804c521669cecb89c370bc4da963e0ef4963e9f0a0e4d59c7adba47b52",
+    "trials/N/sol/trial_3/verdict.json": "98f89347d3fb73454d667727d051ff3e0681d26954ec3771c3da3e7bd0f887b3",
+    "trials/N/sol/trial_4/verdict.json": "d83cb75ffddfe765a2df3999c8de971b946a8966b2c12b4170c548dd556492b8"
+  },
+  "note": "pre-redaction digests; two path prefixes (/REPO,/HOME) redacted in committed files",
+  "redaction": {
+    "effect": "Only absolute repository-root and home-directory prefixes were replaced.",
+    "replacement_labels": [
+      "/REPO",
+      "/HOME"
+    ]
+  }
+}

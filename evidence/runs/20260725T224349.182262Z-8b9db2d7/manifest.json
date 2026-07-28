@@ -1,0 +1,141 @@
+{
+  "agent_command_templates": {
+    "fable": [
+      "claude",
+      "-p",
+      "<PROMPT>",
+      "--model",
+      "claude-fable-5",
+      "--dangerously-skip-permissions",
+      "--max-turns",
+      "80"
+    ],
+    "sol": [
+      "codex",
+      "exec",
+      "<PROMPT>",
+      "-C",
+      "<SANDBOX>",
+      "-s",
+      "workspace-write",
+      "--skip-git-repo-check",
+      "-m",
+      "gpt-5.6-sol",
+      "-c",
+      "model_reasoning_effort=\"high\""
+    ]
+  },
+  "agents": {
+    "fable": {
+      "executable": "claude",
+      "path": "/HOME/.local/bin/claude",
+      "version": "2.1.220 (Claude Code)",
+      "version_returncode": 0
+    },
+    "sol": {
+      "executable": "codex",
+      "path": "/opt/homebrew/bin/codex",
+      "version": "codex-cli 0.144.6",
+      "version_returncode": 0
+    }
+  },
+  "arguments": {
+    "agents": "fable,sol",
+    "budget": 900,
+    "concurrency": 2,
+    "grade_timeout": 300,
+    "isolation": "strict",
+    "k": 1,
+    "preflight_timeout": 300,
+    "runs_root": null,
+    "skip_tool_check": false,
+    "tasks": "M,N"
+  },
+  "argv": [
+    "harness/run_all.py",
+    "--tasks",
+    "M,N",
+    "--agents",
+    "fable,sol",
+    "--k",
+    "1",
+    "--budget",
+    "900",
+    "--grade-timeout",
+    "300",
+    "--preflight-timeout",
+    "300",
+    "--isolation",
+    "strict",
+    "--concurrency",
+    "2"
+  ],
+  "created_at": "2026-07-25T22:43:50.648177Z",
+  "environment": {
+    "machine": "arm64",
+    "platform": "macOS-26.1-arm64-arm-64bit-Mach-O",
+    "python": "3.13.5 (main, Jun 11 2025, 15:36:57) [Clang 17.0.0 (clang-1700.0.13.3)]",
+    "python_executable": "/REPO/.venv/bin/python"
+  },
+  "finished_at": "2026-07-26T00:10:07.008372Z",
+  "harness_files": {
+    "harness/aggregate.py": "080c254565011bd4ff3d76dd01be1fba33b4ec7d0c458fc9d1ae864f35d5d4f0",
+    "harness/candidate_client.py": "1d2f19ea8d8bed918e55788570ad21f8001a49655c510f08247a9554a2082f65",
+    "harness/candidate_executor.py": "502fbee530e0e549758ef2efaa9668a3e97bf32eb02db9a8037c5aefede50358",
+    "harness/candidate_worker.py": "066264ccdccdf7fc78f0b0b1a5c89b3235a7b12f5695f8809ec48af3657b4b17",
+    "harness/isolation.py": "7b16c8d373e9fee9d70b74991358a92b9ee463773ac43f1cdf1b5446f19f2729",
+    "harness/run_all.py": "b25abd5d5674b284227baffe8a400d2e64816b6a6702b9fd8421c57ace2cca2c"
+  },
+  "isolation": {
+    "available": true,
+    "backend": "darwin-seatbelt",
+    "capabilities": {
+      "agent_shared_temp_write_isolated": false,
+      "benchmark_secrets_isolated": true,
+      "candidate_isolated": true,
+      "candidate_network_isolated": true,
+      "candidate_private_temp_isolated": true,
+      "candidate_protocol_fd_isolated": null,
+      "candidate_submission_read_only": true,
+      "host_filesystem_isolated": false,
+      "sibling_trials_isolated": true,
+      "trial_write_isolated": false
+    },
+    "error": null,
+    "evidence": {
+      "dynamic_probe": [
+        "benchmark_secrets_isolated",
+        "sibling_trials_isolated",
+        "candidate_isolated",
+        "candidate_network_isolated",
+        "candidate_submission_read_only",
+        "candidate_private_temp_isolated"
+      ],
+      "unit_tested": [
+        "candidate_protocol_fd_isolated",
+        "candidate_process_group_cleanup",
+        "candidate_output_bounded"
+      ]
+    },
+    "requested": "strict",
+    "warning": "Benchmark-scoped isolation only: hidden verifier/oracle/reference and sibling trials are isolated, but authenticated agent CLIs retain host home/config access; whole-host filesystem and total write isolation are not claimed."
+  },
+  "preflight_passed_at": "2026-07-25T23:15:29.233863Z",
+  "prompt_sha256": "94c425d4bbc9cdc00ee557d523204f5331a3db1bccdd0d3e7bb3bfd337f86f8d",
+  "run_id": "20260725T224349.182262Z-8b9db2d7",
+  "schema_version": 2,
+  "state": "completed",
+  "tasks": {
+    "M": {
+      "path": "tasks/M_conan_graph_explain",
+      "task_sha256": "7e42d5f808eda4ce904dcbe9a121012b8f31137b81f9600cbed6afa1e51153c9",
+      "verifier_sha256": "5f2c354a1f9c204c930cd301b2fb239fbffaba0bf8d28569db68138791f1993d"
+    },
+    "N": {
+      "path": "tasks/N_conan_platform_requires",
+      "task_sha256": "0054a1ba754fe7c62ba04671dd684cd63666a175551663647e978904e9efaf2d",
+      "verifier_sha256": "147a8c83643faf1cfb585c17c3555ba41ab45326f0d9644cd2eb897e37150385"
+    }
+  },
+  "trial_count": 4
+}

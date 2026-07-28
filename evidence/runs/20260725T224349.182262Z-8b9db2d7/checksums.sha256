@@ -1,0 +1,12 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "manifest.json": "70610f151fea467386a260c6cf1e5884d0b8e336c90deb0ea75adaca8d0e4ab5",
+    "preflight.json": "d0f0b0248e160aa161524f8a2d409b2ac8d3f3659ed060ef10efb3797507af0a",
+    "summary.json": "bd0cb1415d449051b4985b8c9eabbd80b319bf50c7e358f21786c9fc6e2f1165",
+    "trials/M/fable/trial_1/verdict.json": "5345082fefaf3bcc8c41c617080a949dff9fb0315e3037b45252bc9bb42eee4c",
+    "trials/M/sol/trial_1/verdict.json": "01ce18e3aea22e9f69ac97e2330300c2d2d32ed5cf72d8bc231feb829f6c1f0d",
+    "trials/N/fable/trial_1/verdict.json": "4dcdc4a67b6b5454ce658e4a1427b08ecaaf91edd3d89944c674cc532c346b99",
+    "trials/N/sol/trial_1/verdict.json": "bce204b099e6a82781ebcef5d71995eccd5e14b94d1ccfb1d99bada1a43ee657"
+  }
+}

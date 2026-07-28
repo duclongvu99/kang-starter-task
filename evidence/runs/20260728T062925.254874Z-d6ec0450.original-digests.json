@@ -1,0 +1,20 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "manifest.json": "7a2427ba6c41212273d3c7b8a68661d802170a8b7df9c23c147a313be3710443",
+    "preflight.json": "e1ec979c2e15826c63beb2954f01650fa0e8f5ab40c7b7884b1ad701b1d7ba7a",
+    "summary.json": "1adc350ebcf87ee7f634ae6b2976c5a7d3819198a815626a4d5645361189e74b",
+    "trials/N/fable/trial_1/verdict.json": "a291c321287d4b667257f815bbd0effc34c7d1f676129001753dd9695cd86fd2",
+    "trials/N/fable/trial_2/verdict.json": "0109bb8e11e856a6422bce5f9728599aaa10e63b82c11364d2cac8ac52f5eb0c",
+    "trials/N/fable/trial_3/verdict.json": "24f18a11cb2473f6b492471d526f99d1a83fe114a7124a410e0226d8463218f7",
+    "trials/N/fable/trial_4/verdict.json": "9b23a73e8fac8ca04baa73147046e5ecb5e3eed85f60c1111fac6c8114ede0d5"
+  },
+  "note": "pre-redaction digests; two path prefixes (/REPO,/HOME) redacted in committed files",
+  "redaction": {
+    "effect": "Only absolute repository-root and home-directory prefixes were replaced.",
+    "replacement_labels": [
+      "/REPO",
+      "/HOME"
+    ]
+  }
+}

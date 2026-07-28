@@ -1,0 +1,136 @@
+{
+  "agent_run": {
+    "command": [
+      "/usr/bin/sandbox-exec",
+      "-p",
+      "(version 1)\n(allow default)\n(deny file-read* file-write* (subpath \"/HOME/Documents/Long_VD_Infor/l_application\"))\n(deny file-write* (subpath \"/private/tmp\") (subpath \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T\"))\n(allow file-read-metadata (literal \"/HOME/Documents/Long_VD_Infor/l_application\") (literal \"/REPO\") (literal \"/REPO/.venv\") (literal \"/REPO/results\") (literal \"/REPO/results/runs\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/N\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/N/fable\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/N/fable/trial_2\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/N/fable/trial_2/agent-private\") (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/N/fable/trial_2/sandbox\"))\n(allow file-read* (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/N/fable/trial_2/sandbox\"))\n(allow file-read* file-write* (subpath \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/N/fable/trial_2/sandbox\"))\n(allow file-read* (literal \"/REPO/.venv\"))\n(allow file-read* (subpath \"/REPO/.venv\"))\n(allow file-read* file-write* (literal \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/N/fable/trial_2/agent-private\"))\n(allow file-read* file-write* (subpath \"/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/N/fable/trial_2/agent-private\"))\n(allow file-write* (literal \"/private/tmp\"))\n(allow file-read* file-write* (literal \"/private/tmp/claude-501\"))\n(allow file-read* file-write* (subpath \"/private/tmp/claude-501\"))\n(allow file-write* (literal \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T\"))\n(allow file-read* file-write* (literal \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/claude-501\"))\n(allow file-read* file-write* (subpath \"/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/claude-501\"))",
+      "claude",
+      "-p",
+      "You are an autonomous coding agent working in the current working directory, which contains a self-contained coding task. Read README.md and SPEC.md first, then complete the task by creating/editing files in this directory. Follow every rule stated in README.md exactly. Verify your own work as best you can. Do not ask questions and do not stop early \u2014 produce the complete deliverable, then finish.",
+      "--model",
+      "claude-fable-5",
+      "--dangerously-skip-permissions",
+      "--max-turns",
+      "80"
+    ],
+    "execution_error": null,
+    "finished_at": "2026-07-26T04:52:40.938128Z",
+    "isolation": {
+      "available": true,
+      "backend": "darwin-seatbelt",
+      "capabilities": {
+        "agent_shared_temp_write_isolated": false,
+        "benchmark_secrets_isolated": null,
+        "candidate_isolated": null,
+        "candidate_network_isolated": null,
+        "candidate_private_temp_isolated": null,
+        "candidate_protocol_fd_isolated": null,
+        "candidate_submission_read_only": null,
+        "host_filesystem_isolated": false,
+        "sibling_trials_isolated": null,
+        "trial_write_isolated": false
+      },
+      "error": null,
+      "evidence": {
+        "dynamic_probe": [],
+        "unit_tested": [
+          "candidate_protocol_fd_isolated",
+          "candidate_process_group_cleanup",
+          "candidate_output_bounded"
+        ]
+      },
+      "requested": "strict",
+      "warning": "Benchmark-scoped isolation only: hidden verifier/oracle/reference and sibling trials are isolated, but authenticated agent CLIs retain host home/config access; whole-host filesystem and total write isolation are not claimed."
+    },
+    "log": "/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/N/fable/trial_2/agent.log",
+    "log_bytes": 198,
+    "log_cap_bytes": 67108864,
+    "log_overflow": false,
+    "returncode": 1,
+    "runtime_scratch_cleanup_error": null,
+    "runtime_scratch_removed": true,
+    "seconds": 84.375,
+    "started_at": "2026-07-26T04:51:16.553798Z",
+    "teardown_error": null,
+    "timed_out": false
+  },
+  "record": {
+    "agent": "fable",
+    "agent_completed": false,
+    "artifact_passed_verifier": false,
+    "failure_modes": [
+      "hidden_or_regression_tests_failed"
+    ],
+    "infra_error": true,
+    "passed": false,
+    "primary_success": false,
+    "returncode": 1,
+    "seconds": 84.375,
+    "status_reason": [
+      "agent_nonzero_exit",
+      "artifact_failed_verifier"
+    ],
+    "task": "N",
+    "timed_out": false,
+    "trial": 2,
+    "trial_valid": false,
+    "verifier_completed": true
+  },
+  "schema_version": 2,
+  "status": {
+    "agent_completed": false,
+    "artifact_passed_verifier": false,
+    "infra_error": true,
+    "primary_success": false,
+    "status_reason": [
+      "agent_nonzero_exit",
+      "artifact_failed_verifier"
+    ],
+    "trial_valid": false,
+    "verifier_completed": true
+  },
+  "verdict": {
+    "failure_modes": [
+      "hidden_or_regression_tests_failed"
+    ],
+    "passed": false,
+    "task": "N_conan_platform_requires",
+    "tests": {
+      "command": [
+        "/REPO/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--disable-warnings",
+        "conans/test/integration/graph/test_platform_requires.py",
+        "conans/test/integration/graph/test_system_tools.py",
+        "conans/test/integration/metadata/test_metadata_collect.py",
+        "conans/test/unittests/client/profile_loader/profile_loader_test.py"
+      ],
+      "returncode": 1,
+      "seconds": 6.108,
+      "tail": "clude(./profile0)\\n[platform_tool_requires]\\ntool1/1.1\")\n    \n        profile_loader = ProfileLoader(cache_folder=temp_folder())  # If not used cache, will not error\n>       profile2 = profile_loader.load_profile(\"./profile2\", tmp)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nconans/test/unittests/client/profile_loader/profile_loader_test.py:120: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nconans/client/profile_loader.py:104: in load_profile\n    profile = self._load_profile(profile_name, cwd)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <conans.client.profile_loader.ProfileLoader object at 0x1074f8d20>\nprofile_name = './profile2'\ncwd = '/private/var/folders/cd/47hyscyj1ld2h11lms3gjl040000gn/T/tmp27fr5ezeconans/path with spaces'\n\n    def _load_profile(self, profile_name, cwd):\n        \"\"\" Will look for \"profile_name\" in disk if profile_name is absolute path,\n        in current folder if path is relative or in the default folder otherwise.\n        return: a Profile object\n        \"\"\"\n        profiles_folder = self._home_paths.profiles_path\n        profile_path = self.get_profile_path(profiles_folder, profile_name, cwd)\n        try:\n            text = load_user_encoded(profile_path)\n        except Exception as e:\n            raise ConanException(f\"Cannot load profile:\\n{e}\")\n    \n        # All profiles will be now rendered with jinja2 as first pass\n        base_path = os.path.dirname(profile_path)\n        file_path = os.path.basename(profile_path)\n        context = {\"platform\": platform,\n                   \"os\": os,\n                   \"profile_dir\": base_path,\n                   \"profile_name\": file_path,\n                   \"conan_version\": conan_version,\n                   \"detect_api\": detect_api}\n        rtemplate = Environment(loader=FileSystemLoader(base_path)).from_string(text)\n        text = rtemplate.render(context)\n    \n        try:\n            return self._recurse_load_profile(text, profile_path)\n        except ConanException as exc:\n>           raise ConanException(\"Error reading '%s' profile: %s\" % (profile_name, exc))\nE           conans.errors.ConanException: Error reading './profile2' profile: Error reading './profile0' profile: ConfigParser: Unrecognized field 'platform_tool_requires'\n\nconans/client/profile_loader.py:134: ConanException\n=========================== short test summary info ============================\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires_non_matching\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires_range\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires_range_non_matching\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_platform_requires_no_host\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_graph_info_platform_requires_range\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_consumer_resolved_version\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_consumer_resolved_revision\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequires::test_consumer_unresolved_revision\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPlatformRequiresLock::test_platform_requires_range\nFAILED conans/test/integration/graph/test_platform_requires.py::TestGenerators::test_platform_requires_range\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPackageID::test_package_id_modes[recipe_revision_mode]\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPackageID::test_package_id_modes[full_package_mode]\nFAILED conans/test/integration/graph/test_platform_requires.py::TestPackageID::test_package_id_explicit_revision\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_non_matching\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_range_non_matching\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_system_tool_require_no_host\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_graph_info_system_tool_require_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_consumer_resolved_version\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_consumer_resolved_revision\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequires::test_consumer_unresolved_revision\nFAILED conans/test/integration/graph/test_system_tools.py::TestToolRequiresLock::test_system_tool_require_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestGenerators::test_system_tool_require_range\nFAILED conans/test/integration/graph/test_system_tools.py::TestPackageID::test_package_id_modes[recipe_revision_mode]\nFAILED conans/test/integration/graph/test_system_tools.py::TestPackageID::test_package_id_modes[full_package_mode]\nFAILED conans/test/integration/graph/test_system_tools.py::TestPackageID::test_package_id_explicit_revision\nFAILED conans/test/integration/metadata/test_metadata_collect.py::test_custom_command_collect\nFAILED conans/test/unittests/client/profile_loader/profile_loader_test.py::test_profile_compose_platform_tool_requires\n30 failed, 11 passed, 10 warnings in 4.62s\n"
+    }
+  },
+  "verifier_run": {
+    "command": [
+      "/REPO/.venv/bin/python",
+      "/REPO/tasks/N_conan_platform_requires/verifier/verify.py",
+      "--submission",
+      "/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/N/fable/trial_2/sandbox"
+    ],
+    "completed": true,
+    "error": null,
+    "execution_error": null,
+    "finished_at": "2026-07-26T04:52:48.460890Z",
+    "log": "/REPO/results/runs/20260726T034819.662937Z-ae330dd8/trials/N/fable/trial_2/verifier.log",
+    "log_bytes": 6766,
+    "log_cap_bytes": 67108864,
+    "log_overflow": false,
+    "returncode": 0,
+    "seconds": 7.388,
+    "started_at": "2026-07-26T04:52:41.073252Z",
+    "teardown_error": null,
+    "timed_out": false
+  }
+}

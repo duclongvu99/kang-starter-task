@@ -12,6 +12,7 @@ HARNESS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HARNESS))
 
 import aggregate  # noqa: E402
+import export_evidence  # noqa: E402
 import run_all  # noqa: E402
 
 
@@ -168,6 +169,47 @@ def _mutate_verdict_and_reseal(run_dir: Path, mutate) -> None:
     verdict.write_text(json.dumps(payload), encoding="utf-8")
     (run_dir / "checksums.sha256").unlink()
     run_all.write_checksums(run_dir)
+
+
+def test_evidence_export_redacts_paths_and_remains_aggregatable(tmp_path: Path) -> None:
+    home = tmp_path / "private-home"
+    repo = home / "private-repo"
+    repo.mkdir(parents=True)
+    run_dir = _write_completed_run(
+        repo,
+        [
+            {
+                "task": "A",
+                "agent": "sol",
+                "trial": 1,
+                "primary_success": False,
+                "artifact_passed_verifier": False,
+                "infra_error": False,
+                "trial_valid": True,
+            }
+        ],
+    )
+    manifest_path = run_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["private_paths_for_test"] = [str(repo / "task"), str(home / ".config")]
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    (run_dir / "preflight.json").write_text(
+        json.dumps({"repo": str(repo), "home": str(home)}), encoding="utf-8"
+    )
+    (run_dir / "summary.json").write_text("{}", encoding="utf-8")
+    (run_dir / "checksums.sha256").unlink()
+    run_all.write_checksums(run_dir)
+
+    destination_root = tmp_path / "bundles"
+    exported = export_evidence.export_bundle(run_dir, destination_root, repo, home)
+    combined = b"\n".join(path.read_bytes() for path in export_evidence._selected_files(exported))
+    assert str(repo).encode() not in combined
+    assert str(home).encode() not in combined
+    assert b"/REPO/task" in combined
+    assert b"/HOME/.config" in combined
+    assert (destination_root / f"{run_dir.name}.original-digests.json").is_file()
+    summary = aggregate.aggregate_run(exported)
+    assert summary["A"]["sol"]["valid_attempts"] == 1
 
 
 def test_unique_run_directories_never_collide(tmp_path: Path) -> None:
@@ -393,6 +435,43 @@ def test_ambiguous_infra_word_still_voids_when_harness_saw_a_failure(tmp_path: P
     assert "agent_infra_signature:authentication" in record["status_reason"]
 
 
+def test_source_line_401_does_not_masquerade_as_http_auth_failure(tmp_path: Path) -> None:
+    """A timed-out code search can print ``file.py:401:`` in an otherwise normal log."""
+    log = tmp_path / "source-line.log"
+    log.write_text(
+        "conans/client/graph/graph_binaries.py:401: if node.binary == BINARY_BUILD\n",
+        encoding="utf-8",
+    )
+    reasons = run_all.classify_agent_infrastructure(
+        {"returncode": -15, "timed_out": True, "execution_error": None}, log
+    )
+    assert "agent_infra_signature:authentication" not in reasons
+
+
+def test_trial_removes_private_runtime_scratch_before_evidence_sealing(tmp_path: Path) -> None:
+    task = _fake_task(tmp_path)
+    run_dir = tmp_path / "run-scratch"
+    run_dir.mkdir()
+
+    def scratch_agent(sandbox: Path, budget: int, log_path: Path) -> dict:
+        scratch = sandbox.parent / "agent-private"
+        scratch.mkdir()
+        target = scratch / "target.txt"
+        target.write_text("temporary", encoding="utf-8")
+        (scratch / "link.txt").symlink_to(target)
+        return _agent_result(log_path, "done\n", 0)
+
+    verifier_meta = {"completed": True, "error": None, "seconds": 0.1}
+    with (
+        mock.patch.dict(run_all.TASK_DIRS, {"A": task}, clear=True),
+        mock.patch.dict(run_all.AGENTS, {"sol": scratch_agent}, clear=True),
+        mock.patch.object(run_all, "grade", return_value=({"passed": True}, verifier_meta)),
+    ):
+        record = run_all.one_trial("A", "sol", 1, 1, 1, run_dir)
+    assert record["primary_success"] is True
+    assert not (run_dir / "trials" / "A" / "sol" / "trial_1" / "agent-private").exists()
+
+
 def test_platform_refusal_is_labeled_distinctly_not_as_nonzero_exit(tmp_path: Path) -> None:
     """A safety refusal is its own outcome, never a generic nonzero exit or infra failure.
 
@@ -610,7 +689,7 @@ def test_aggregation_rejects_inconsistent_primary_success(tmp_path: Path) -> Non
         aggregate.aggregate_run(run_dir)
 
 
-def test_evidence_symlink_to_external_target_is_rejected_after_seal(tmp_path: Path) -> None:
+def test_replacing_sealed_file_with_symlink_is_checksum_mismatch(tmp_path: Path) -> None:
     run_dir = _write_completed_run(
         tmp_path,
         [{"task": "A", "agent": "sol", "trial": 1, "trial_valid": True}],
@@ -621,18 +700,31 @@ def test_evidence_symlink_to_external_target_is_rejected_after_seal(tmp_path: Pa
     verdict.unlink()
     verdict.symlink_to(external)
     external.write_text("{}", encoding="utf-8")
-    with pytest.raises(ValueError, match="symlink file forbidden"):
+    with pytest.raises(ValueError, match="checksum mismatch"):
         aggregate.verify_checksums(run_dir)
 
 
-def test_checksum_seal_rejects_symlink_directory(tmp_path: Path) -> None:
+def test_checksum_seals_symlink_without_following_external_directory(tmp_path: Path) -> None:
     run_dir = tmp_path / "run-symlink"
     run_dir.mkdir()
     external = tmp_path / "external-dir"
     external.mkdir()
-    (run_dir / "linked").symlink_to(external, target_is_directory=True)
-    with pytest.raises(ValueError, match="symlink directory forbidden"):
-        run_all.write_checksums(run_dir)
+    (external / "outside.txt").write_text("before", encoding="utf-8")
+    linked = run_dir / "linked"
+    linked.symlink_to(external, target_is_directory=True)
+    run_all.write_checksums(run_dir)
+    aggregate.verify_checksums(run_dir)
+
+    # The target is outside the evidence root and must never be followed.
+    (external / "outside.txt").write_text("after", encoding="utf-8")
+    aggregate.verify_checksums(run_dir)
+
+    linked.unlink()
+    other = tmp_path / "other-external-dir"
+    other.mkdir()
+    linked.symlink_to(other, target_is_directory=True)
+    with pytest.raises(ValueError, match="checksum mismatch"):
+        aggregate.verify_checksums(run_dir)
 
 
 def test_successful_execute_completes_seals_and_aggregates(tmp_path: Path) -> None:

@@ -1,0 +1,367 @@
+diff --git a/conan/api/subapi/list.py b/conan/api/subapi/list.py
+index b3eba6917..53cca76fb 100644
+--- a/conan/api/subapi/list.py
++++ b/conan/api/subapi/list.py
+@@ -1,8 +1,10 @@
+ from typing import Dict
+ 
+ from conan.api.model import PackagesList
++from conan.api.output import ConanOutput
+ from conan.internal.conan_app import ConanApp
+ from conans.errors import ConanException, NotFoundException
++from conans.model.info import load_binary_info
+ from conans.model.package_ref import PkgReference
+ from conans.model.recipe_ref import RecipeReference
+ from conans.search.search import get_cache_packages_binary_info, filter_packages
+@@ -164,3 +166,113 @@ class ListAPI:
+                 select_bundle.add_prefs(rrev, prefs)
+                 select_bundle.add_configurations(packages)
+         return select_bundle
++
++    def explain_missing_binaries(self, ref, conaninfo, remotes):
++        ConanOutput().info(f"Missing binary: {ref}")
++        ConanOutput().info(f"With conaninfo.txt (package_id):\n{conaninfo.dumps()}")
++        conaninfo = load_binary_info(conaninfo.dumps())
++        # Collect all configurations
++        candidates = []
++        ConanOutput().info(f"Finding binaries in the cache")
++        pkg_configurations = self.packages_configurations(ref)
++        candidates.extend(_BinaryDistance(pref, data, conaninfo)
++                          for pref, data in pkg_configurations.items())
++
++        for remote in remotes:
++            try:
++                ConanOutput().info(f"Finding binaries in remote {remote.name}")
++                pkg_configurations = self.packages_configurations(ref, remote=remote)
++            except Exception as e:
++                pass
++                ConanOutput(f"ERROR IN REMOTE {remote.name}: {e}")
++            else:
++                candidates.extend(_BinaryDistance(pref, data, conaninfo, remote)
++                                  for pref, data in pkg_configurations.items())
++
++        candidates.sort()
++        pkglist = PackagesList()
++        pkglist.add_refs([ref])
++        # If there are exact matches, only return the matches
++        # else, limit to the number specified
++        candidate_distance = None
++        for candidate in candidates:
++            if candidate_distance and candidate.distance != candidate_distance:
++                break
++            candidate_distance = candidate.distance
++            pref = candidate.pref
++            pkglist.add_prefs(ref, [pref])
++            pkglist.add_configurations({pref: candidate.binary_config})
++            # Add the diff data
++            rev_dict = pkglist.recipes[str(pref.ref)]["revisions"][pref.ref.revision]
++            rev_dict["packages"][pref.package_id]["diff"] = candidate.serialize()
++            remote = candidate.remote.name if candidate.remote else "Local Cache"
++            rev_dict["packages"][pref.package_id]["remote"] = remote
++        return pkglist
++
++
++class _BinaryDistance:
++    def __init__(self, pref, binary_config, expected_config, remote=None):
++        self.remote = remote
++        self.pref = pref
++        self.binary_config = binary_config
++
++        # Settings
++        self.platform_diff = {}
++        self.settings_diff = {}
++        binary_settings = binary_config.get("settings", {})
++        expected_settings = expected_config.get("settings", {})
++        for k, v in expected_settings.items():
++            value = binary_settings.get(k)
++            if value is not None and value != v:
++                diff = self.platform_diff if k in ("os", "arch") else self.settings_diff
++                diff.setdefault("expected", []).append(f"{k}={v}")
++                diff.setdefault("existing", []).append(f"{k}={value}")
++
++        # Options
++        self.options_diff = {}
++        binary_options = binary_config.get("options", {})
++        expected_options = expected_config.get("options", {})
++        for k, v in expected_options.items():
++            value = binary_options.get(k)
++            if value is not None and value != v:
++                self.options_diff.setdefault("expected", []).append(f"{k}={v}")
++                self.options_diff.setdefault("existing", []).append(f"{k}={value}")
++
++        # Requires
++        self.deps_diff = {}
++        binary_requires = binary_config.get("requires", [])
++        expected_requires = expected_config.get("requires", [])
++        binary_requires = [RecipeReference.loads(r) for r in binary_requires]
++        expected_requires = [RecipeReference.loads(r) for r in expected_requires]
++        binary_requires = {r.name: r for r in binary_requires}
++        for r in expected_requires:
++            existing = binary_requires.get(r.name)
++            if not existing or r != existing:
++                self.deps_diff.setdefault("expected", []).append(repr(r))
++                self.deps_diff.setdefault("existing", []).append(repr(existing))
++
++    def __lt__(self, other):
++        return self.distance < other.distance
++
++    def explanation(self):
++        if self.platform_diff:
++            return "This binary belongs to another OS or Architecture, highly incompatible."
++        if self.settings_diff:
++            return "This binary was built with different settings."
++        if self.options_diff:
++            return "This binary was built with the same settings, but different options"
++        if self.deps_diff:
++            return "This binary has same settings and options, but different dependencies"
++        return "This binary is an exact match for the defined inputs"
++
++    @property
++    def distance(self):
++        return len(self.platform_diff), len(self.settings_diff), \
++               len(self.options_diff), len(self.deps_diff)
++
++    def serialize(self):
++        return {"platform": self.platform_diff,
++                "settings": self.settings_diff,
++                "options": self.options_diff,
++                "dependencies": self.deps_diff,
++                "explanation": self.explanation()}
+diff --git a/conan/cli/commands/graph.py b/conan/cli/commands/graph.py
+index fd6de6727..966b3ac46 100644
+--- a/conan/cli/commands/graph.py
++++ b/conan/cli/commands/graph.py
+@@ -1,15 +1,33 @@
+ import json
+ import os
++
+ from conan.api.output import ConanOutput, cli_out_write, Color
+ from conan.cli import make_abs_path
+ from conan.cli.args import common_graph_args, validate_common_graph_args
+ from conan.cli.command import conan_command, conan_subcommand
++from conan.cli.commands.list import prepare_pkglist_compact, print_serial
+ from conan.cli.formatters.graph import format_graph_html, format_graph_json, format_graph_dot
+ from conan.cli.formatters.graph.graph_info_text import format_graph_info
+ from conan.cli.printers.graph import print_graph_packages, print_graph_basic
++from conan.errors import ConanException
+ from conan.internal.deploy import do_deploys
++from conans.client.graph.graph import BINARY_MISSING
+ from conans.client.graph.install_graph import InstallGraph
+-from conan.errors import ConanException
++from conans.model.recipe_ref import ref_matches
++
++
++def explain_formatter_text(data):
++    if "closest_binaries" in data:
++        # To be able to reuse the print_list_compact method,
++        # we need to wrap this in a MultiPackagesList
++        pkglist = data["closest_binaries"]
++        prepare_pkglist_compact(pkglist)
++        print_serial(pkglist)
++
++
++def explain_formatter_json(data):
++    myjson = json.dumps(data, indent=4)
++    cli_out_write(myjson)
+ 
+ 
+ @conan_command(group="Consumer")
+@@ -179,3 +197,75 @@ def graph_info(conan_api, parser, subparser, *args):
+             "field_filter": args.filter,
+             "package_filter": args.package_filter,
+             "conan_api": conan_api}
++
++
++@conan_subcommand(formatters={"text": explain_formatter_text,
++                              "json": explain_formatter_json})
++def graph_explain(conan_api, parser,  subparser, *args):
++    """
++    Explain what is wrong with the dependency graph, like report missing binaries closest
++    alternatives, trying to explain why the existing binaries do not match
++    """
++    common_graph_args(subparser)
++    subparser.add_argument("--check-updates", default=False, action="store_true",
++                           help="Check if there are recipe updates")
++    subparser.add_argument("--build-require", action='store_true', default=False,
++                           help='Whether the provided reference is a build-require')
++    subparser.add_argument('--missing', nargs="?",
++                           help="A pattern in the form 'pkg/version#revision:package_id#revision', "
++                                "e.g: zlib/1.2.13:* means all binaries for zlib/1.2.13. "
++                                "If revision is not specified, it is assumed latest one.")
++
++    args = parser.parse_args(*args)
++    # parameter validation
++    validate_common_graph_args(args)
++
++    cwd = os.getcwd()
++    path = conan_api.local.get_conanfile_path(args.path, cwd, py=None) if args.path else None
++
++    # Basic collaborators, remotes, lockfile, profiles
++    remotes = conan_api.remotes.list(args.remote) if not args.no_remote else []
++    overrides = eval(args.lockfile_overrides) if args.lockfile_overrides else None
++    lockfile = conan_api.lockfile.get_lockfile(lockfile=args.lockfile,
++                                               conanfile_path=path,
++                                               cwd=cwd,
++                                               partial=args.lockfile_partial,
++                                               overrides=overrides)
++    profile_host, profile_build = conan_api.profiles.get_profiles_from_args(args)
++
++    if path:
++        deps_graph = conan_api.graph.load_graph_consumer(path, args.name, args.version,
++                                                         args.user, args.channel,
++                                                         profile_host, profile_build, lockfile,
++                                                         remotes, args.update,
++                                                         check_updates=args.check_updates,
++                                                         is_build_require=args.build_require)
++    else:
++        deps_graph = conan_api.graph.load_graph_requires(args.requires, args.tool_requires,
++                                                         profile_host, profile_build, lockfile,
++                                                         remotes, args.update,
++                                                         check_updates=args.check_updates)
++    print_graph_basic(deps_graph)
++    deps_graph.report_graph_error()
++    conan_api.graph.analyze_binaries(deps_graph, args.build, remotes=remotes, update=args.update,
++                                     lockfile=lockfile)
++    print_graph_packages(deps_graph)
++
++    ConanOutput().title("Retrieving and computing closest binaries")
++    # compute ref and conaninfo
++    missing = args.missing
++    for node in deps_graph.ordered_iterate():
++        if node.binary == BINARY_MISSING:
++            if not missing or ref_matches(node.ref, missing, is_consumer=None):
++                ref = node.ref
++                conaninfo = node.conanfile.info
++                break
++    else:
++        raise ConanException("There is no missing binary")
++
++    pkglist = conan_api.list.explain_missing_binaries(ref, conaninfo, remotes)
++
++    ConanOutput().title("Closest binaries")
++    return {
++        "closest_binaries": pkglist.serialize(),
++    }
+diff --git a/conan/cli/commands/list.py b/conan/cli/commands/list.py
+index 6a346d9a7..48a7cdffd 100644
+--- a/conan/cli/commands/list.py
++++ b/conan/cli/commands/list.py
+@@ -35,6 +35,8 @@ def print_serial(item, indent=None, color_index=None):
+                 elif k.lower() == "warning":
+                     color = Color.BRIGHT_YELLOW
+                     k = "WARN"
++                color = Color.BRIGHT_RED if k == "expected" else color
++                color = Color.BRIGHT_GREEN if k == "existing" else color
+                 cli_out_write(f"{indent}{k}: {v}", fg=color)
+             else:
+                 cli_out_write(f"{indent}{k}", fg=color)
+@@ -95,23 +97,27 @@ def print_list_compact(results):
+         if not remote_info or "error" in remote_info:
+             info[remote] = {"warning": "There are no matching recipe references"}
+             continue
+-        new_remote_info = {}
+-        for ref, ref_info in remote_info.items():
+-            new_ref_info = {}
+-            for rrev, rrev_info in ref_info.get("revisions", {}).items():
+-                new_rrev = f"{ref}#{rrev}"
+-                timestamp = rrev_info.pop("timestamp", None)
+-                if timestamp:
+-                    new_rrev += f" ({timestamp_to_str(timestamp)})"
+-
+-                packages = rrev_info.pop("packages", None)
+-                if packages:
+-                    for pid, pid_info in packages.items():
+-                        new_pid = f"{ref}#{rrev}:{pid}"
+-                        rrev_info[new_pid] = pid_info
+-                new_ref_info[new_rrev] = rrev_info
+-            new_remote_info[ref] = new_ref_info
+-        info[remote] = new_remote_info
++        prepare_pkglist_compact(remote_info)
++
++    print_serial(info)
++
++
++def prepare_pkglist_compact(pkglist):
++    for ref, ref_info in pkglist.items():
++        new_ref_info = {}
++        for rrev, rrev_info in ref_info.get("revisions", {}).items():
++            new_rrev = f"{ref}#{rrev}"
++            timestamp = rrev_info.pop("timestamp", None)
++            if timestamp:
++                new_rrev += f" ({timestamp_to_str(timestamp)})"
++
++            packages = rrev_info.pop("packages", None)
++            if packages:
++                for pid, pid_info in packages.items():
++                    new_pid = f"{ref}#{rrev}:{pid}"
++                    rrev_info[new_pid] = pid_info
++            new_ref_info[new_rrev] = rrev_info
++        pkglist[ref] = new_ref_info
+ 
+     def compute_common_options(pkgs):
+         """ compute the common subset of existing options with same values of a set of packages
+@@ -157,18 +163,32 @@ def print_list_compact(results):
+                 result[k] = v
+         return result
+ 
+-    for remote, remote_info in info.items():
+-        for ref, revisions in remote_info.items():
+-            if not isinstance(revisions, dict):
++    def compact_diff(diffinfo):
++        """ return a compact and red/green diff for binary differences
++        """
++        result = {}
++        for k, v in diffinfo.items():
++            if not v:
+                 continue
+-            for rrev, prefs in revisions.items():
+-                pkg_common_options = compute_common_options(prefs)
+-                pkg_common_options = pkg_common_options if len(pkg_common_options) > 4 else None
+-                for pref, pref_contents in prefs.items():
+-                    pref_info = pref_contents.pop("info")
+-                    pref_contents.update(compact_format_info(pref_info, pkg_common_options))
++            if isinstance(v, dict):
++                result[k] = {"expected": ", ".join(value for value in v["expected"]),
++                             "existing": ", ".join(value for value in v["existing"])}
++            else:
++                result[k] = v
++        return result
+ 
+-    print_serial(info)
++    for ref, revisions in pkglist.items():
++        if not isinstance(revisions, dict):
++            continue
++        for rrev, prefs in revisions.items():
++            pkg_common_options = compute_common_options(prefs)
++            pkg_common_options = pkg_common_options if len(pkg_common_options) > 4 else None
++            for pref, pref_contents in prefs.items():
++                pref_info = pref_contents.pop("info")
++                pref_contents.update(compact_format_info(pref_info, pkg_common_options))
++                diff_info = pref_contents.pop("diff", None)
++                if diff_info is not None:
++                    pref_contents["diff"] = compact_diff(diff_info)
+ 
+ 
+ def print_list_json(data):
+diff --git a/conans/client/graph/install_graph.py b/conans/client/graph/install_graph.py
+index 3a92e19ba..9db92d812 100644
+--- a/conans/client/graph/install_graph.py
++++ b/conans/client/graph/install_graph.py
+@@ -326,12 +326,13 @@ class InstallGraph:
+             else:
+                 build_str = " ".join(list(sorted(["--build=%s" % str(pref.ref)
+                                                   for pref in missing_prefs])))
+-            build_msg = f"or try to build locally from sources using the '{build_str}' argument"
++            build_msg = f"Try to build locally from sources using the '{build_str}' argument"
+ 
+         raise ConanException(textwrap.dedent(f'''\
+-           Missing prebuilt package for '{missing_pkgs}'
+-           Check the available packages using 'conan list {ref}:* -r=remote'
+-           {build_msg}
++           Missing prebuilt package for '{missing_pkgs}'. You can try:
++               - List all available packages using 'conan list {ref}:* -r=remote'
++               - Explain missing binaries: replace 'conan install ...' with 'conan graph explain ...'
++               - {build_msg}
+ 
+            More Info at 'https://docs.conan.io/2/knowledge/faq.html#error-missing-prebuilt-package'
+            '''))
